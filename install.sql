@@ -6,7 +6,7 @@ CREATE TABLE audits (
 	entity_id   char(36)     NOT NULL,	-- For PolymorphicBehavior compatibility
 	json_object text         NOT NULL,	-- A snapshot of the complete object at the time of the change
 	description text         NULL,
-	source_id   char(36)     NULL, 			-- A user id, if applicable
+	source_id   varchar(255) NULL, 			-- A value to indicate the source of the change (user id, etc.)
 	created     datetime     NOT NULL,
 	
 	PRIMARY KEY (id)
