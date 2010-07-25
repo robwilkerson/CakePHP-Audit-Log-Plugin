@@ -20,9 +20,22 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 1. Create a `current_user()` method, if desired.
 
     The `AuditableBehavior` optionally allows each changeset to be "owned" by a "source"--typically the user responsible for the change. Since user and authentication models vary widely, the behavior supports a callback method that should return the value to be stored as the source of the change, if any.
-    
-    This method must be available to every model that cares to track a source of changes, so it's recommended that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
-    
+
+    The `current_user()` method must be available to every model that cares to track a source of changes, so it's recommended that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
+
+	Storing the changeset source can be a little tricky if the core Auth component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in the `AppController`:
+	
+        if( !empty( $this->data ) ) {
+          $this->data['User'] = $this->Auth->user();
+        }
+
+    The behavior expects the `current_user()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
+
+        # In this example, user data is stored in an Administrator model
+        public function current_user() {
+          return $this->data['User']['Administrator'];
+        }
+
 1. Attach the behavior to any desired model and configure.
 
 ## Usage
@@ -38,6 +51,16 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
 
 ### Syntax
 
+    # Simple syntax accepting default options
+	class Task extends AppModel {
+      public $actsAs = array( 'Auditable' );
+	        
+      # 
+      # Additional model code.
+      #
+    }
+	
+	# Syntax with explicit options
     class Task extends AppModel {
       public $actsAs = array(
         'Auditable' => array(
@@ -61,4 +84,4 @@ This code is licensed under the [MIT license](http://www.opensource.org/licenses
 
 ## Notes
 
-Feel free to suggest improvements in a ticket or fork this project and improve upon it yourself. Contributions welcome.
+Feel free to submit bug reports or suggest improvements in a ticket or fork this project and improve upon it yourself. Contributions welcome.

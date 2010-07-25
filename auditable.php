@@ -79,7 +79,7 @@ class AuditableBehavior extends ModelBehavior {
 	 * Executed after a save operation completes.
 	 *
 	 * @param 	$created	Boolean. True if the save operation was an
-	 * 						insertion. False otherwise.
+	 * 										insertion. False otherwise.
 	 * @return	void
 	 */
 	public function afterSave( $model, $created ) {
@@ -97,8 +97,14 @@ class AuditableBehavior extends ModelBehavior {
 			array( 'hasMany' => array( 'AuditDelta' ) )
 		);
 		
-		# TODO: Create callback to retrieve current user
-		$sourceId = null;
+		/**
+		 * If a current_user() method exists in the model class (or, of
+		 * course, in a superclass) the call that method to pull all user
+		 * data. Assume than an id field exists.
+		 */
+		if( method_exists( $model, 'current_user' ) ) {
+			$source = $model->current_user();
+		}
 		
 		$data = array(
 			'Audit' => array(
@@ -106,7 +112,7 @@ class AuditableBehavior extends ModelBehavior {
 				'model'     => $model->alias,
 				'entity_id' => $model->id,
 				'json_object' => json_encode( $audit ),
-				'source_id'	=> $sourceId
+				'source_id'	=> $source['id']
 			)
 		);
 
