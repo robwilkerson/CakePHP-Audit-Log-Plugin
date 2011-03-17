@@ -29,7 +29,7 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
           $this->data['User'] = $this->Auth->user();
         }
 
-    The behavior expects the `current_user()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
+    The behavior expects the `current_user()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`. I've added this bit in `AppModel::beforeFilter()`:
 
         # In this example, user data is stored in an Administrator model
         public function current_user() {
