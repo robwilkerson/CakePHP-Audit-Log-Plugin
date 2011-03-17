@@ -23,13 +23,13 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 
     The `current_user()` method must be available to every model that cares to track a source of changes, so it's recommended that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
 
-	Storing the changeset source can be a little tricky if the core Auth component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in the `AppController`:
+	Storing the changeset source can be a little tricky if the core Auth component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in `AppController::beforeFilter()`:
 	
         if( !empty( $this->data ) ) {
           $this->data['User'] = $this->Auth->user();
         }
 
-    The behavior expects the `current_user()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`. I've added this bit in `AppModel::beforeFilter()`:
+    The behavior expects the `current_user()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
 
         # In this example, user data is stored in an Administrator model
         public function current_user() {
