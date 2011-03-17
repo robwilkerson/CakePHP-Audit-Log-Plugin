@@ -46,7 +46,7 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
 	<dt>`ignore`</dt>
 	<dd>An array of property names to be ignored when records are created in the deltas table.</dd>
 	<dt>`habtm`</dt>
-	<dd>An array of models that have a HABTM relationship with the acting model and whose changes should be monitored with the model. If the HABTM model is auditable in its own right, don't include it here. This option is for related models whose changes are _only_ track relative to the acting model.</dd>
+	<dd>An array of models that have a HABTM relationship with the acting model and whose changes should be monitored with the model. If the HABTM model is auditable in its own right, don't include it here. This option is for related models whose changes are _only_ tracked relative to the acting model.</dd>
 </dl>
 
 ### Syntax
