@@ -1,13 +1,13 @@
-# AuditableBehavior
+# Audit Log Plugin
 
-A logging behavior for [CakePHP](http://cakephp.org). The `AuditableBehavior`  creates an audit history for each instance of a model that it's attached to.
+A logging plugin for [CakePHP](http://cakephp.org). The included `AuditableBehavior`  creates an audit history for each instance of a model to which it's attached.
 
 The behavior tracks changes on two levels. It takes a snapshot of the fully hydrated object _after_ a change is complete and it also records each individual change in the case of an update action.
 
 ## Features
 
 * Tracks object snapshots as well as individual property changes.
-* Allows each revision record to be attached to a source--usually a user--of responsibility for the change.
+* Allows each revision record to be attached to a source -- usually a user -- of responsibility for the change.
 * Allows developers to ignore changes to specified properties. Properties named `created`, `updated` and `modified` are ignored by default, but these values can be overwritten.
 * Handles changes to HABTM associations.
 * Fully compatible with the [`PolymorphicBehavior`](http://bakery.cakephp.org/articles/view/polymorphic-behavior).
@@ -15,27 +15,40 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 
 ## Installation
 
+### As an Archive
+
+1. Click the big ol' **Downloads** button next to the project description.
+1. Extract the archive to `app/plugins/audit_log`.
+
+### As a Submodule
+
+1. `$ git submodule add git://github.com/robwilkerson/CakePHP-Audit-Log-Plugin.git <path_to>/app/plugins/audit_log`
+1. `$ git submodule init`
+1. `$ git submodule update`
+
+### Next Steps
+
 1. Run the `install.sql` file on your CakePHP application database. This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
-1. Save `auditable.php` to `<application root>/app/models/behaviors/`.
 1. Create a `current_user()` method, if desired.
 
-    The `AuditableBehavior` optionally allows each changeset to be "owned" by a "source"--typically the user responsible for the change. Since user and authentication models vary widely, the behavior supports a callback method that should return the value to be stored as the source of the change, if any.
+    The `AuditableBehavior` optionally allows each changeset to be "owned" by a "source" -- typically the user responsible for the change. Since user and authentication models vary widely, the behavior supports a callback method that should return the value to be stored as the source of the change, if any.
 
-    The `current_user()` method must be available to every model that cares to track a source of changes, so it's recommended that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
+    The `current_user()` method must be available to every model that cares to track a source of changes, so I recommend that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
 
-	Storing the changeset source can be a little tricky if the core Auth component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in `AppController::beforeFilter()`:
+	Storing the changeset source can be a little tricky if the core `Auth` component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in `AppController::beforeFilter()`:
 	
-        if( !empty( $this->data ) ) {
-          $this->data['User'] = $this->Auth->user();
+        if( !empty( $this->data ) && empty( $this->data[$this->Auth->userModel] ) ) {
+          $this->data[$this->Auth->userModel] = $this->current_user();
         }
 
     The behavior expects the `current_user()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
 
-        # In this example, user data is stored in an Administrator model
-        public function current_user() {
-          return $this->data['User']['Administrator'];
+        protected function current_user() {
+          $user = $this->Auth->user();
+          
+          return $user[$this->Auth->userModel]; # Return the complete user array
         }
-
+  
 1. Attach the behavior to any desired model and configure.
 
 ## Usage
@@ -52,15 +65,15 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
 ### Syntax
 
     # Simple syntax accepting default options
-	class Task extends AppModel {
+    class Task extends AppModel {
       public $actsAs = array( 'Auditable' );
-	        
+          
       # 
       # Additional model code.
       #
     }
-	
-	# Syntax with explicit options
+    
+    # Syntax with explicit options
     class Task extends AppModel {
       public $actsAs = array(
         'Auditable' => array(
@@ -76,7 +89,7 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
 
 ## Limitations
 
-* Only MySQL is supported. It should be a trivial exercise to support other databases, but I don't need to do so for my own use and probably won't do so unless requested.
+* Only MySQL is supported. It should be (famous last words) a trivial exercise to support other databases, but I don't need to do so for my own use and probably won't do so unless requested.
 
 ## License
 
