@@ -23,7 +23,7 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 
     The `current_user()` method must be available to every model that cares to track a source of changes, so it's recommended that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
 
-	Storing the changeset source can be a little tricky if the core Auth component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in the `AppController`:
+	Storing the changeset source can be a little tricky if the core Auth component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in `AppController::beforeFilter()`:
 	
         if( !empty( $this->data ) ) {
           $this->data['User'] = $this->Auth->user();
@@ -46,7 +46,7 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
 	<dt>`ignore`</dt>
 	<dd>An array of property names to be ignored when records are created in the deltas table.</dd>
 	<dt>`habtm`</dt>
-	<dd>An array of models that have a HABTM relationship with the acting model and whose changes should be monitored with the model. If the HABTM model is auditable in its own right, don't include it here. This option is for related models whose changes are _only_ track relative to the acting model.</dd>
+	<dd>An array of models that have a HABTM relationship with the acting model and whose changes should be monitored with the model. If the HABTM model is auditable in its own right, don't include it here. This option is for related models whose changes are _only_ tracked relative to the acting model.</dd>
 </dl>
 
 ### Syntax
