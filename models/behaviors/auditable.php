@@ -40,7 +40,7 @@ class AuditableBehavior extends ModelBehavior {
     if( !is_array( $settings ) ) {
       $settings = array();
     }
-    $this->settings[$model->alias] = array_merge( $this->settings[$model->alias], $settings );
+    $this->settings[$model->alias] = array_merge_recursive( $this->settings[$model->alias], $settings );
 
     /**
      * Ensure that no HABTM models which are already auditable
