@@ -132,22 +132,7 @@ class AuditableBehavior extends ModelBehavior {
         continue;
       }
 
-      if( $created ) {
-        /**
-         * For newly created objects, we're going to insert every
-         * non-ignored property with null old_value fields.
-         */
-        $delta = array(
-          'AuditDelta' => array(
-            'audit_log_id'  => $model->Audit->id,
-            'property_name' => $property,
-            'old_value'     => null,
-            'new_value'     => $value
-          )
-        );
-        array_push( $updates, $delta );
-      }
-      else {
+      if( !$created ) {
         if( array_key_exists( $property, $this->_original[$model->alias] ) && $this->_original[$model->alias][$property] != $value ) {
           /**
            * If the property exists in the original _and_ the
@@ -165,7 +150,9 @@ class AuditableBehavior extends ModelBehavior {
       }
     }
 
-    if( count( $updates ) ) {
+    # Insert an audit record if a new model record is being created
+    # or if something we care about actually changed.
+    if( $created || count( $updates ) ) {
       $model->Audit->create();
       $model->Audit->save( $data );
 
@@ -179,7 +166,10 @@ class AuditableBehavior extends ModelBehavior {
           $model->afterAuditUpdate( $model, $this->_original, $updates, $model->Audit->id );
         }
       }
-
+    }
+    
+    # Insert a delta record if something changed.
+    if( count( $updates ) ) {
       foreach( $updates as $delta ) {
         $delta['AuditDelta']['audit_id'] = $model->Audit->id;
 
