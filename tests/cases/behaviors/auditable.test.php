@@ -17,7 +17,9 @@ class Article extends CakeTestModel {
    */
   public $name = 'Article';
   public $actsAs = array(
-    'AuditLog.Auditable'
+    'AuditLog.Auditable' => array(
+      'ignore' => array( 'ignored_field' ),
+    )
   );
 }
 
@@ -32,7 +34,7 @@ class AuditableBehaviorTest extends CakeTestCase {
    * @access public
    */
 	public $fixtures = array(
-		'core.article',
+		'plugin.audit_log.article',
     'plugin.audit_log.audit',
     'plugin.audit_log.audit_delta',
 	);
@@ -117,7 +119,8 @@ class AuditableBehaviorTest extends CakeTestCase {
       'Article' => array(
         'user_id' => 1,
         'title' => 'First Test Article', 
-        'body' => 'First Test Article Body', 
+        'body' => 'First Test Article Body',
+        'ignored_field' => 1,
         'published' => 'N', 
       ),
     );
@@ -172,7 +175,8 @@ class AuditableBehaviorTest extends CakeTestCase {
       'Article' => array(
         'user_id' => 1,
         'title' => 'First Test Article (Second Edit)', 
-        'body' => 'First Test Article Body (Also Edited)', 
+        'body' => 'First Test Article Body (Also Edited)',
+        'ignored_field' => 0,
         'published' => 'Y', 
       ),
     );
@@ -191,6 +195,7 @@ class AuditableBehaviorTest extends CakeTestCase {
       )
     );
     
+    # There are 4 changes, but one to an ignored field
     $this->assertEqual( 3, count( $last_audit['AuditDelta'] ) );
     $this->assertEqual( 'First Test Article (Edited)', array_shift( Set::extract( '/AuditDelta[property_name=title]/old_value', $last_audit ) ) );
     $this->assertEqual( 'First Test Article (Second Edit)', array_shift( Set::extract( '/AuditDelta[property_name=title]/new_value', $last_audit ) ) );
@@ -200,5 +205,43 @@ class AuditableBehaviorTest extends CakeTestCase {
     
     $this->assertEqual( 'N', array_shift( Set::extract( '/AuditDelta[property_name=published]/old_value', $last_audit ) ) );
     $this->assertEqual( 'Y', array_shift( Set::extract( '/AuditDelta[property_name=published]/new_value', $last_audit ) ) );
+    
+    # No delta should be reported against the ignored field.
+    $this->assertIdentical( array(), Set::extract( '/AuditDelta[property_name=ignored_field]', $last_audit ) );
+  }
+  
+  public function testIgnoredField() {
+    $this->Audit      = ClassRegistry::init( 'Audit' );
+    $this->AuditDelta = ClassRegistry::init( 'AuditDelta' );
+    
+    $new_article = array(
+      'Article' => array(
+        'user_id' => 1,
+        'title' => 'First Test Article', 
+        'body' => 'First Test Article Body',
+        'ignored_field' => 1,
+        'published' => 'N', 
+      ),
+    );
+    
+    # TEST NO AUDIT RECORD IF ONLY CHANGE IS IGNORED FIELD
+    
+    $this->Article->save( $new_article );
+    $this->Article->saveField( 'ignored_field', '5' );
+    
+    $last_audit = $this->Audit->find(
+      'count',
+      array(
+        'contain'    => array( 'AuditDelta' ),
+        'conditions' => array(
+          'Audit.event'     => 'EDIT',
+          'Audit.model'     => 'Article',
+          'Audit.entity_id' => $this->Article->id
+        ),
+        'order' => 'Audit.created DESC',
+      )
+    );
+    
+    $this->assertEqual( 0, $last_audit );
   }
 }
