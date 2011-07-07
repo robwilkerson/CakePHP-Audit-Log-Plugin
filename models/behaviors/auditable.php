@@ -126,9 +126,9 @@ class AuditableBehavior extends ModelBehavior {
       $delta = array();
 
       /**
-       * Ignore specified properties
+       * Ignore virtual fields (Cake 1.3+) and specified properties
        */
-      if( in_array( $property, $this->settings[$model->alias]['ignore'] )  ) {
+      if( ( method_exists( $model, 'isVirtualField' ) && $model->isVirtualField( $property ) ) || in_array( $property, $this->settings[$model->alias]['ignore'] )  ) {
         continue;
       }
 
