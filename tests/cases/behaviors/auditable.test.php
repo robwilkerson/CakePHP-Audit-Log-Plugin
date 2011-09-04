@@ -67,9 +67,9 @@ class AuditableBehaviorTest extends CakeTestCase {
   public function testCreate() {
     $new_article = array(
       'Article' => array(
-        'user_id' => 1,
-        'title' => 'First Test Article', 
-        'body' => 'First Test Article Body', 
+        'user_id'   => 1,
+        'title'     => 'First Test Article', 
+        'body'      => 'First Test Article Body', 
         'published' => 'N', 
       ),
     );
@@ -79,9 +79,9 @@ class AuditableBehaviorTest extends CakeTestCase {
       'first',
       array(
         'recursive'  => -1,
-        'conditions' => array(
-          'Audit.event' => 'CREATE',
-          'Audit.model' => 'Article',
+        'conditions'        => array(
+          'Audit.event'     => 'CREATE',
+          'Audit.model'     => 'Article',
           'Audit.entity_id' => $this->Article->getLastInsertId()
         )
       )
@@ -117,11 +117,11 @@ class AuditableBehaviorTest extends CakeTestCase {
     
     $new_article = array(
       'Article' => array(
-        'user_id' => 1,
-        'title' => 'First Test Article', 
-        'body' => 'First Test Article Body',
+        'user_id'       => 1,
+        'title'         => 'First Test Article', 
+        'body'          => 'First Test Article Body',
         'ignored_field' => 1,
-        'published' => 'N', 
+        'published'     => 'N', 
       ),
     );
     
@@ -173,11 +173,11 @@ class AuditableBehaviorTest extends CakeTestCase {
     
     $updated_article = array(
       'Article' => array(
-        'user_id' => 1,
-        'title' => 'First Test Article (Second Edit)', 
-        'body' => 'First Test Article Body (Also Edited)',
+        'user_id'       => 1,
+        'title'         => 'First Test Article (Second Edit)', 
+        'body'          => 'First Test Article Body (Also Edited)',
         'ignored_field' => 0,
-        'published' => 'Y', 
+        'published'     => 'Y', 
       ),
     );
     $this->Article->save( $updated_article );
@@ -216,11 +216,11 @@ class AuditableBehaviorTest extends CakeTestCase {
     
     $new_article = array(
       'Article' => array(
-        'user_id' => 1,
-        'title' => 'First Test Article', 
-        'body' => 'First Test Article Body',
+        'user_id'       => 1,
+        'title'         => 'First Test Article', 
+        'body'          => 'First Test Article Body',
         'ignored_field' => 1,
-        'published' => 'N', 
+        'published'     => 'N', 
       ),
     );
     
@@ -243,5 +243,37 @@ class AuditableBehaviorTest extends CakeTestCase {
     );
     
     $this->assertEqual( 0, $last_audit );
+  }
+  
+  public function testDelete() {
+    $this->Audit      = ClassRegistry::init( 'Audit' );
+    $this->AuditDelta = ClassRegistry::init( 'AuditDelta' );
+    
+    $article = $this->Article->find(
+      'first',
+      array(
+        'contain' => false,
+        'order'   => array( 'rand()' ),
+      )
+    );
+    
+    $id = $article['Article']['id'];
+    
+    $this->Article->delete( $id );
+    
+    $last_audit = $this->Audit->find(
+      'all',
+      array(
+        'contain'    => array( 'AuditDelta' ),
+        'conditions' => array(
+          'Audit.event'     => 'DELETE',
+          'Audit.model'     => 'Article',
+          'Audit.entity_id' => $id,
+        ),
+        'order' => 'Audit.created DESC',
+      )
+    );
+    
+    $this->assertEqual( 1, count( $last_audit ) );
   }
 }

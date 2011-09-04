@@ -59,19 +59,36 @@ class AuditableBehavior extends ModelBehavior {
   }
 
   /**
-   * function beforeSave
    * Executed before a save() operation.
    *
-   * @return  Boolean
+   * @return  boolean
+   * @access  public
    */
   public function beforeSave( $model ) {
-    /**
-     * If we're editing an existing object, save off a copy of
-     * the object as it exists before any changes.
-     */
+    # If we're editing an existing object, save off a copy of
+    # the object as it exists before any changes.
     if( !empty( $model->id ) ) {
       $this->_original = $this->_getModelData( $model );
     }
+  }
+  
+  /**
+   * Executed before a delete() operation.
+   *
+   * @param 	$model
+   * @return	boolean
+   * @access	public
+   */
+  public function beforeDelete( $model, $cascade = true ) {
+    $this->_original = $model->find(
+      'first',
+      array(
+        'contain'    => false,
+        'conditions' => array( $model->alias . '.' . $model->primaryKey => $model->id ),
+      )
+    );
+    
+    return true;
   }
 
   /**
@@ -201,6 +218,39 @@ class AuditableBehavior extends ModelBehavior {
     if( isset( $this->_original ) ) {
       $this->_original = null;
     }
+  }
+  
+  /**
+   * Executed after a model is deleted.
+   *
+   * @param 	$model
+   * @return	void
+   * @access	public
+   */
+  public function afterDelete( $model ) {
+    /**
+     * If a current_user() method exists in the model class (or, of
+     * course, in a superclass) the call that method to pull all user
+     * data. Assume than an id field exists.
+     */
+    $source = array();
+    if( method_exists( $model, 'current_user' ) ) {
+      $source = $model->current_user();
+    }
+    
+    $audit = $this->_original;
+    $data  = array(
+      'Audit' => array(
+        'event'       => 'DELETE',
+        'model'       => $model->alias,
+        'entity_id'   => $model->id,
+        'json_object' => json_encode( $audit ),
+        'source_id'   => isset( $source['id'] ) ? $source['id'] : null
+      )
+    );
+    
+    $this->Audit = ClassRegistry::init( 'Audit' );
+    $this->Audit->save( $data );
   }
 
   /**
