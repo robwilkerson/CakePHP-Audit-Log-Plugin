@@ -52,7 +52,7 @@ class AuditableBehavior extends ModelBehavior {
        * Note the "===" in the condition. The type check is important,
        * so don't change it just because it may look like a mistake.
        */
-      if( !array_key_exists( $model_name, $model->hasAndBelongsToMany ) || array_search( 'Auditable', $model->$model_name->actsAs ) === true ) {
+      if( !array_key_exists( $model_name, $model->hasAndBelongsToMany ) || ( is_array($model->$model_name->actsAs) && array_search( 'Auditable', $model->$model_name->actsAs ) === true ) ) {
         unset( $this->settings[$model->alias]['habtm'][$index] );
       }
     }
