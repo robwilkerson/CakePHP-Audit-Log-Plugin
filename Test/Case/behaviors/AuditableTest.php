@@ -34,9 +34,9 @@ class AuditableBehaviorTest extends CakeTestCase {
    * @access public
    */
 	public $fixtures = array(
-		'plugin.audit_log.article',
-    'plugin.audit_log.audit',
-    'plugin.audit_log.audit_delta',
+	'plugin.AuditLog.Article',
+	'plugin.AuditLog.Audit',
+	'plugin.AuditLog.AuditDelta',
 	);
   
   /**
