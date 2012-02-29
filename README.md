@@ -38,21 +38,21 @@ To create tables you can use schema shell. To create tables execute:
 ### Next Steps
 
 1. Run the `install.sql` file on your CakePHP application database. This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
-1. Create a `current_user()` method, if desired.
+1. Create a `currentUser()` method, if desired.
 
     The `AuditableBehavior` optionally allows each changeset to be "owned" by a "source" -- typically the user responsible for the change. Since user and authentication models vary widely, the behavior supports a callback method that should return the value to be stored as the source of the change, if any.
 
-    The `current_user()` method must be available to every model that cares to track a source of changes, so I recommend that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
+    The `currentUser()` method must be available to every model that cares to track a source of changes, so I recommend that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
 
 	Storing the changeset source can be a little tricky if the core `Auth` component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in `AppController::beforeFilter()`:
 	
         if( !empty( $this->data ) && empty( $this->data[$this->Auth->userModel] ) ) {
-          $this->data[$this->Auth->userModel] = $this->current_user();
+          $this->data[$this->Auth->userModel] = $this->currentUser();
         }
 
-    The behavior expects the `current_user()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
+    The behavior expects the `currentUser()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
 
-        protected function current_user() {
+        protected function currentUser() {
           $user = $this->Auth->user();
           
           return $user[$this->Auth->userModel]; # Return the complete user array

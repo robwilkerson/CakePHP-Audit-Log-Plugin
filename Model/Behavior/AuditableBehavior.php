@@ -117,13 +117,13 @@ class AuditableBehavior extends ModelBehavior {
     );
     
     /**
-     * If a current_user() method exists in the model class (or, of
+     * If a currentUser() method exists in the model class (or, of
      * course, in a superclass) the call that method to pull all user
      * data. Assume than an id field exists.
      */
     $source = array();
-    if( method_exists( $Model, 'current_user' ) ) {
-      $source = $Model->current_user();
+    if( method_exists( $Model, 'currentUser' ) ) {
+      $source = $Model->currentUser();
     }
     
     $data = array(
@@ -232,13 +232,13 @@ class AuditableBehavior extends ModelBehavior {
    */
   public function afterDelete( $Model ) {
     /**
-     * If a current_user() method exists in the model class (or, of
+     * If a currentUser() method exists in the model class (or, of
      * course, in a superclass) the call that method to pull all user
      * data. Assume than an id field exists.
      */
     $source = array();
-    if( method_exists( $Model, 'current_user' ) ) {
-      $source = $Model->current_user();
+    if( method_exists( $Model, 'currentUser' ) ) {
+      $source = $Model->currentUser();
     }
     
     $audit = $this->_original;
