@@ -250,6 +250,7 @@ class AuditableBehavior extends ModelBehavior {
     );
     
     $this->Audit = ClassRegistry::init( 'Audit' );
+    $model->Audit->create();
     $this->Audit->save( $data );
   }
 
