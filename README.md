@@ -12,38 +12,47 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 * Handles changes to HABTM associations.
 * Fully compatible with the [`PolymorphicBehavior`](http://bakery.cakephp.org/articles/view/polymorphic-behavior).
 * Does not require or rely on the existence of explicit models revisions (`AuditLog`) and deltas (`AuditLogDeltas`).
+* CakePHP >= 2.0
 
 ## Installation
 
-### As an Archive
+### CakePHP >= 2.0
+
+#### As an Archive  
 
 1. Click the big ol' **Downloads** button next to the project description.
-1. Extract the archive to `app/plugins/audit_log`.
+1. Extract the archive to `app/Plugin/AuditLog`.
 
-### As a Submodule
+#### As a Submodule
 
-1. `$ git submodule add git://github.com/robwilkerson/CakePHP-Audit-Log-Plugin.git <path_to>/app/plugins/audit_log`
+1. `$ git submodule add git://github.com/jasonsnider/CakePHP-Audit-Log-Plugin.git <path_to>/app/Plugin/AuditLog`
 1. `$ git submodule init`
 1. `$ git submodule update`
+
+To create tables you can use schema shell. To create tables execute:
+
+    cd <path_to>/app/
+    chmod +x ./Console/cake
+    ./Console/cake schema create --plugin AuditLog --name AuditLog
 
 ### Next Steps
 
 1. Run the `install.sql` file on your CakePHP application database. This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
-1. Create a `current_user()` method, if desired.
+1. Create a `currentUser()` method, if desired.
 
     The `AuditableBehavior` optionally allows each changeset to be "owned" by a "source" -- typically the user responsible for the change. Since user and authentication models vary widely, the behavior supports a callback method that should return the value to be stored as the source of the change, if any.
 
-    The `current_user()` method must be available to every model that cares to track a source of changes, so I recommend that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
+    The `currentUser()` method must be available to every model that cares to track a source of changes, so I recommend that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
 
 	Storing the changeset source can be a little tricky if the core `Auth` component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in `AppController::beforeFilter()`:
 	
         if( !empty( $this->data ) && empty( $this->data[$this->Auth->userModel] ) ) {
-          $this->data[$this->Auth->userModel] = $this->current_user();
+          $this->data[$this->Auth->userModel] = $this->currentUser();
         }
 
-    The behavior expects the `current_user()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
+    The behavior expects the `currentUser()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
 
-        protected function current_user() {
+        protected function currentUser() {
           $user = $this->Auth->user();
           
           return $user[$this->Auth->userModel]; # Return the complete user array
@@ -89,11 +98,15 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
 
 ## Limitations
 
-* Only MySQL is supported. It should be (famous last words) a trivial exercise to support other databases, but I don't need to do so for my own use and probably won't do so unless requested.
+* This is not backwards compatible with CakePHP <=1.3. If you need compatibility with these version please visit [the original project](http://github.com/robwilkerson/CakePHP-Audit-Log-Plugin). 
 
 ## License
 
 This code is licensed under the [MIT license](http://www.opensource.org/licenses/mit-license.php).
+
+## Credits
+This is a fork of [Rob Wilkerson's AuditLog Plugin](http://github.com/robwilkerson/CakePHP-Audit-Log-Plugin).
+This version has been updated for compatibility with CakePHP 2.0 and hopefully :) better cross DBMS support.
 
 ## Notes
 

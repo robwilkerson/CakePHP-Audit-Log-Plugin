@@ -244,11 +244,10 @@ class AuditableBehaviorTest extends CakeTestCase {
     
     $this->assertEqual( 0, $last_audit );
   }
-  
+
   public function testDelete() {
     $this->Audit      = ClassRegistry::init( 'Audit' );
     $this->AuditDelta = ClassRegistry::init( 'AuditDelta' );
-    
     $article = $this->Article->find(
       'first',
       array(
@@ -264,7 +263,7 @@ class AuditableBehaviorTest extends CakeTestCase {
     $last_audit = $this->Audit->find(
       'all',
       array(
-        'contain'    => array( 'AuditDelta' ),
+        //'contain'    => array( 'AuditDelta' ), <-- What does this solve?
         'conditions' => array(
           'Audit.event'     => 'DELETE',
           'Audit.model'     => 'Article',
