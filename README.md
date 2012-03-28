@@ -89,7 +89,7 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
     # Syntax with explicit options
     class Task extends AppModel {
       public $actsAs = array(
-        'Auditable' => array(
+        'AuditLog.Auditable' => array(
           'ignore' => array( 'active', 'name', 'updated' ),
           'habtm'  => array( 'Type', 'Project' )
         )
