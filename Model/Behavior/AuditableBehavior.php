@@ -122,11 +122,9 @@ class AuditableBehavior extends ModelBehavior {
      * data. Assume than an id field exists.
      */
     $source = array();
-    if( method_exists( $Model, 'currentUser' ) ) {
+    if ( is_callable( array( $Model, 'currentUser' ) ) ) {
       $source = $Model->currentUser();
-    }
-    
-    if( method_exists( $Model, 'current_user' ) ) {
+    } else if ( is_callable( array( $Model, 'current_user' ) ) ) {
       $source = $Model->current_user();
     }
     
@@ -241,8 +239,10 @@ class AuditableBehavior extends ModelBehavior {
      * data. Assume than an id field exists.
      */
     $source = array();
-    if( method_exists( $Model, 'currentUser' ) ) {
+    if( is_callable( array( $Model, 'currentUser' ) ) ) {
       $source = $Model->currentUser();
+    } else if ( is_callable( array( $Model, 'current_user' ) ) ) {
+      $source = $Model->current_user();
     }
     
     $audit = $this->_original;
