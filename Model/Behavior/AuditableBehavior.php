@@ -46,13 +46,13 @@ class AuditableBehavior extends ModelBehavior {
      * snuck into the settings array. That would be bad. Same for
      * any model which isn't a HABTM association.
      */
-    foreach( $this->settings[$Model->alias]['habtm'] as $index => $Model_name ) {
-      /*
+    foreach( $this->settings[$Model->alias]['habtm'] as $index => $model_name ) {
+      /**
        * Note the "===" in the condition. The type check is important,
        * so don't change it just because it may look like a mistake.
        */
-      if( !array_key_exists( $model_name, $model->hasAndBelongsToMany ) || ( is_array($model->$model_name->actsAs) && array_search( 'Auditable', $model->$model_name->actsAs ) === true ) ) {
-        unset( $this->settings[$model->alias]['habtm'][$index] );
+      if( !array_key_exists( $model_name, $Model->hasAndBelongsToMany ) || ( is_array($Model->$model_name->actsAs) && array_search( 'Auditable', $Model->$model_name->actsAs ) === true ) ) {
+        unset( $this->settings[$Model->alias]['habtm'][$index] );
       }
     }
   }
