@@ -1,6 +1,7 @@
 <?php
 
-App::import( 'Core', array( 'AppModel', 'Model' ) );
+App::uses( 'Model', 'Model' );
+App::uses( 'AppModel', 'Model' );
 
 /**
  * Article class
@@ -13,7 +14,6 @@ class Article extends CakeTestModel {
    * name property
    *
    * @var string 'Article'
-   * @access public
    */
   public $name = 'Article';
   public $actsAs = array(
@@ -21,6 +21,22 @@ class Article extends CakeTestModel {
       'ignore' => array( 'ignored_field' ),
     )
   );
+
+  public function currentUser() {
+    return array( 'id' => 1 );
+  }
+}
+
+class Audit extends CakeTestModel {
+    public $hasMany = array(
+        'AuditDelta'
+    );
+}
+
+class AuditDelta extends CakeTestModel {
+    public $belongsTo = array(
+        'Audit'
+    );
 }
 
 /**
@@ -33,31 +49,31 @@ class AuditableBehaviorTest extends CakeTestCase {
    * @var array
    * @access public
    */
-	public $fixtures = array(
-		'plugin.audit_log.article',
+  public $fixtures = array(
+    'plugin.audit_log.article',
     'plugin.audit_log.audit',
     'plugin.audit_log.audit_delta',
-	);
+  );
   
   /**
    * Method executed before each test
    *
    * @access public
    */
-	public function startTest() {
-		$this->Article = ClassRegistry::init( 'Article' );
-	}
+  public function startTest() {
+    $this->Article = ClassRegistry::init( 'Article' );
+  }
   
   /**
    * Method executed after each test
    *
    * @access public
    */
-	public function endTest() {
-		unset( $this->Article );
+  public function endTest() {
+    unset( $this->Article );
 
-		ClassRegistry::flush();
-	}
+    ClassRegistry::flush();
+  }
   
   /**
    * Test the action of creating a new record.
@@ -133,6 +149,7 @@ class AuditableBehaviorTest extends CakeTestCase {
     $audit_records = $this->Audit->find(
       'all',
       array(
+        'recursive' => 0,
         'conditions' => array(
           'Audit.model' => 'Article',
           'Audit.entity_id' => $this->Article->getLastInsertId()
