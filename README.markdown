@@ -48,15 +48,15 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 
     With that in place, it's a snap to create the `AppModel::current_user()` callback:
 
-      /**
-       * Returns the current user object/array.
-       *  
-       * @return  mixed   null if empty or an array
-       * @access  public
-       */
-      public function current_user() {
-        return Configure::read( 'User' );
-      }
+        /**
+         * Returns the current user object/array.
+         *  
+         * @return  mixed   null if empty or an array
+         * @access  public
+         */
+        public function current_user() {
+          return Configure::read( 'User' );
+        }
 
 1. Attach the behavior to any desired model and configure.
 
