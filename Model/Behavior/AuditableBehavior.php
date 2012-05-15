@@ -10,7 +10,7 @@ class AuditableBehavior extends ModelBehavior {
    *
    * @var   Object
    */
-  private $_original = null;
+  private $_original = array();
 
   /**
    * Initiate behavior for the model using specified settings.
@@ -66,7 +66,7 @@ class AuditableBehavior extends ModelBehavior {
     # If we're editing an existing object, save off a copy of
     # the object as it exists before any changes.
     if( !empty( $Model->id ) ) {
-      $this->_original = $this->_getModelData( $Model );
+      $this->_original[$Model->alias] = $this->_getModelData( $Model );
     }
     
     return true;
@@ -79,13 +79,14 @@ class AuditableBehavior extends ModelBehavior {
    * @return	boolean
    */
   public function beforeDelete( Model $Model, $cascade = true ) {
-    $this->_original = $Model->find(
+    $original = $Model->find(
       'first',
       array(
         'contain'    => false,
         'conditions' => array( $Model->alias . '.' . $Model->primaryKey => $Model->id ),
       )
     );
+    $this->_original[$Model->alias] = $original[$Model->alias];
     
     return true;
   }
@@ -99,7 +100,7 @@ class AuditableBehavior extends ModelBehavior {
    * @return  void
    */
   public function afterSave( Model $Model, $created ) {
-    $audit = $this->_getModelData( $Model );
+    $audit = array( $Model->alias => $this->_getModelData( $Model ) );
     $audit[$Model->alias][$Model->primaryKey] = $Model->id;
 
     /*
@@ -218,7 +219,7 @@ class AuditableBehavior extends ModelBehavior {
      * call.
      */
     if( isset( $this->_original ) ) {
-      $this->_original = null;
+      $this->_original = array();
     }
     return true;    
   }
@@ -242,7 +243,7 @@ class AuditableBehavior extends ModelBehavior {
       $source = $Model->current_user();
     }
     
-    $audit = $this->_original;
+    $audit = array( $Model->alias => $this->_original[$Model->alias] );
     $data  = array(
       'Audit' => array(
         'event'       => 'DELETE',
@@ -306,6 +307,6 @@ class AuditableBehavior extends ModelBehavior {
       }
     }
 
-    return $audit_data;
+    return $audit_data[$Model->alias];
   }
 }
