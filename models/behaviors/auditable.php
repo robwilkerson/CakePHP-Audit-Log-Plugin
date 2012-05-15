@@ -11,7 +11,7 @@ class AuditableBehavior extends ModelBehavior {
    * @var   Object
    * @access  private
    */
-  private $_original = null;
+  private $_original = array();
 
   /**
    * Initiate behavior for the model using specified settings.
@@ -77,7 +77,7 @@ class AuditableBehavior extends ModelBehavior {
     # If we're editing an existing object, save off a copy of
     # the object as it exists before any changes.
     if( !empty( $model->id ) ) {
-      $this->_original = $this->_getModelData( $model );
+      $this->_original[$model->alias] = $this->_getModelData( $model );
     }
   }
   
@@ -89,13 +89,14 @@ class AuditableBehavior extends ModelBehavior {
    * @access	public
    */
   public function beforeDelete( $model, $cascade = true ) {
-    $this->_original = $model->find(
+    $original = $model->find(
       'first',
       array(
         'contain'    => false,
         'conditions' => array( $model->alias . '.' . $model->primaryKey => $model->id ),
       )
     );
+    $this->_original[$model->alias] = $original[$model->alias];
     
     return true;
   }
@@ -109,7 +110,7 @@ class AuditableBehavior extends ModelBehavior {
    * @return  void
    */
   public function afterSave( $model, $created ) {
-    $audit = $this->_getModelData( $model );
+    $audit = array( $model->alias => $this->_getModelData( $model ) );
     $audit[$model->alias][$model->primaryKey] = $model->id;
 
     /**
@@ -225,7 +226,7 @@ class AuditableBehavior extends ModelBehavior {
      * call.
      */
     if( isset( $this->_original ) ) {
-      $this->_original = null;
+      $this->_original = array();
     }
   }
   
@@ -247,7 +248,7 @@ class AuditableBehavior extends ModelBehavior {
       $source = $model->current_user();
     }
     
-    $audit = $this->_original;
+    $audit = array( $model->alias => $this->_original[$model->alias] );
     $data  = array(
       'Audit' => array(
         'event'       => 'DELETE',
@@ -311,6 +312,6 @@ class AuditableBehavior extends ModelBehavior {
       }
     }
 
-    return $audit_data;
+    return $audit_data[$model->alias];
   }
 }
