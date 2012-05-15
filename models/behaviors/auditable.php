@@ -42,6 +42,15 @@ class AuditableBehavior extends ModelBehavior {
     }
     $this->settings[$model->alias] = array_merge_recursive( $this->settings[$model->alias], $settings );
 
+    # Attach the containable behavior if it's not already there.
+    if( !$model->Behaviors->attached( 'Containable' ) ) {
+      $model->Behaviors->attach( 'Containable' );
+    }
+    # Likewise, enable the behavior if it's disabled
+    if( !$model->Behaviors->enabled( 'Containable' ) ) {
+      $model->Behaviors->enable( 'Containable' );
+    }
+
     /**
      * Ensure that no HABTM models which are already auditable
      * snuck into the settings array. That would be bad. Same for
