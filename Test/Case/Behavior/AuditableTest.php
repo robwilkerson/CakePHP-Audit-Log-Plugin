@@ -180,19 +180,28 @@ class AuditableBehaviorTest extends CakeTestCase {
     $delta = array_shift( $delta_records );
     $this->assertEqual( 'First Test Article', $delta['AuditDelta']['old_value'] );
     $this->assertEqual( 'First Test Article (Edited)', $delta['AuditDelta']['new_value'] );
-  
+
     # TEST UPDATE OF MULTIPLE PROPERTIES
-    
     # Pause to simulate a gap between edits
     # This also allows us to retrieve the last edit for the next set
     # of tests.
-    sleep( 1 );
-    
+    $this->Article->create(); # Clear the article id so we get  a new record.
+    $new_article = array(
+      'Article' => array(
+        'user_id'       => 1,
+        'title'         => 'Second Test Article', 
+        'body'          => 'Second Test Article Body',
+        'ignored_field' => 1,
+        'published'     => 'N', 
+      ),
+    );
+    $this->Article->save( $new_article );
+
     $updated_article = array(
       'Article' => array(
         'user_id'       => 1,
-        'title'         => 'First Test Article (Second Edit)', 
-        'body'          => 'First Test Article Body (Also Edited)',
+        'title'         => 'Second Test Article (Newly Edited)', 
+        'body'          => 'Second Test Article Body (Also Edited)',
         'ignored_field' => 0,
         'published'     => 'Y', 
       ),
@@ -211,14 +220,14 @@ class AuditableBehaviorTest extends CakeTestCase {
         'order' => 'Audit.created DESC',
       )
     );
-    
+
     # There are 4 changes, but one to an ignored field
     $this->assertEqual( 3, count( $last_audit['AuditDelta'] ) );
-    $this->assertEqual( 'First Test Article (Edited)', array_shift( Set::extract( '/AuditDelta[property_name=title]/old_value', $last_audit ) ) );
-    $this->assertEqual( 'First Test Article (Second Edit)', array_shift( Set::extract( '/AuditDelta[property_name=title]/new_value', $last_audit ) ) );
+    $this->assertEqual( 'Second Test Article', array_shift( Set::extract( '/AuditDelta[property_name=title]/old_value', $last_audit ) ) );
+    $this->assertEqual( 'Second Test Article (Newly Edited)', array_shift( Set::extract( '/AuditDelta[property_name=title]/new_value', $last_audit ) ) );
     
-    $this->assertEqual( 'First Test Article Body', array_shift( Set::extract( '/AuditDelta[property_name=body]/old_value', $last_audit ) ) );
-    $this->assertEqual( 'First Test Article Body (Also Edited)', array_shift( Set::extract( '/AuditDelta[property_name=body]/new_value', $last_audit ) ) );
+    $this->assertEqual( 'Second Test Article Body', array_shift( Set::extract( '/AuditDelta[property_name=body]/old_value', $last_audit ) ) );
+    $this->assertEqual( 'Second Test Article Body (Also Edited)', array_shift( Set::extract( '/AuditDelta[property_name=body]/new_value', $last_audit ) ) );
     
     $this->assertEqual( 'N', array_shift( Set::extract( '/AuditDelta[property_name=published]/old_value', $last_audit ) ) );
     $this->assertEqual( 'Y', array_shift( Set::extract( '/AuditDelta[property_name=published]/new_value', $last_audit ) ) );
