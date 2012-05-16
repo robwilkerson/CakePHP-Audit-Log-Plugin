@@ -9,18 +9,27 @@ App::import( 'Core', array( 'AppModel', 'Model' ) );
  * @subpackage    cake.tests.cases.libs.model
  */
 class Article extends CakeTestModel {
-  /**
-   * name property
-   *
-   * @var string 'Article'
-   * @access public
-   */
   public $name = 'Article';
   public $actsAs = array(
     'AuditLog.Auditable' => array(
       'ignore' => array( 'ignored_field' ),
     )
   );
+  public $belongsTo = array( 'Author' );
+}
+
+/**
+ * Author class
+ *
+ * @package       cake
+ * @subpackage    cake.tests.cases.libs.model
+ */
+class Author extends CakeTestModel {
+  public $name = 'Author';
+  public $actsAs = array(
+    'AuditLog.Auditable'
+  );
+  public $hasMany = array( 'Article' );
 }
 
 /**
@@ -35,6 +44,7 @@ class AuditableBehaviorTest extends CakeTestCase {
    */
 	public $fixtures = array(
 		'plugin.audit_log.article',
+    'plugin.audit_log.author',
     'plugin.audit_log.audit',
     'plugin.audit_log.audit_delta',
 	);
@@ -68,6 +78,7 @@ class AuditableBehaviorTest extends CakeTestCase {
     $new_article = array(
       'Article' => array(
         'user_id'   => 1,
+        'author_id' => 1,
         'title'     => 'First Test Article', 
         'body'      => 'First Test Article Body', 
         'published' => 'N', 
@@ -101,8 +112,66 @@ class AuditableBehaviorTest extends CakeTestCase {
     $this->assertEqual( 'First Test Article', $article['Article']['title'] );
     $this->assertEqual( 'N', $article['Article']['published'] );
     
-    #Verify that no delta record was created.
+    # Verify that no delta record was created.
     $this->assertTrue( empty( $deltas ) );
+
+    # TEST SAVEALL
+
+    # With model and one associated record
+    $data = array(
+      'Article' => array(
+        'user_id'   => 1,
+        'title'     => 'Rob\'s Test Article', 
+        'body'      => 'Rob\'s Test Article Body', 
+        'published' => 'Y', 
+      ),
+      'Author' => array(
+        'first_name' => 'Rob',
+        'last_name' => 'Wilkerson',
+      ),
+    );
+
+    $this->Article->saveAll( $data );
+    $article_audit = ClassRegistry::init( 'Audit' )->find(
+      'first',
+      array(
+        'recursive'  => -1,
+        'conditions'        => array(
+          'Audit.event'     => 'CREATE',
+          'Audit.model'     => 'Article',
+          'Audit.entity_id' => $this->Article->getLastInsertId()
+        )
+      )
+    );
+    $article = json_decode( $article_audit['Audit']['json_object'], true );
+
+    # Verify the audit record
+    $this->assertEqual( 1, $article['Article']['user_id'] );
+    $this->assertEqual( 'Rob\'s Test Article', $article['Article']['title'] );
+    $this->assertEqual( 'Y', $article['Article']['published'] );
+    
+    # Verify that no delta record was created.
+    $this->assertTrue( !isset( $article_audit['AuditDelta'] ) );
+
+    $author_audit = ClassRegistry::init( 'Audit' )->find(
+      'first',
+      array(
+        'recursive'  => -1,
+        'conditions'        => array(
+          'Audit.event'     => 'CREATE',
+          'Audit.model'     => 'Author',
+          'Audit.entity_id' => $this->Article->Author->getLastInsertId()
+        )
+      )
+    );
+    $author = json_decode( $author_audit['Audit']['json_object'], true );
+
+    # Verify the audit record
+    $this->assertEqual( $article['Article']['author_id'], $author['Author']['id'] );
+    $this->assertEqual( 'Rob', $author['Author']['first_name'] );
+    
+    # Verify that no delta record was created.
+    $this->assertTrue( !isset( $author_audit['AuditDelta'] ) );
   }
   
   /**
@@ -118,6 +187,7 @@ class AuditableBehaviorTest extends CakeTestCase {
     $new_article = array(
       'Article' => array(
         'user_id'       => 1,
+        'author_id'     => 1,
         'title'         => 'First Test Article', 
         'body'          => 'First Test Article Body',
         'ignored_field' => 1,
@@ -174,6 +244,7 @@ class AuditableBehaviorTest extends CakeTestCase {
     $updated_article = array(
       'Article' => array(
         'user_id'       => 1,
+        'author_id'     => 1,
         'title'         => 'First Test Article (Second Edit)', 
         'body'          => 'First Test Article Body (Also Edited)',
         'ignored_field' => 0,
@@ -217,6 +288,7 @@ class AuditableBehaviorTest extends CakeTestCase {
     $new_article = array(
       'Article' => array(
         'user_id'       => 1,
+        'author_id'     => 1,
         'title'         => 'First Test Article', 
         'body'          => 'First Test Article Body',
         'ignored_field' => 1,

@@ -1,9 +1,9 @@
 <?php
 
 class AuditFixture extends CakeTestFixture {
-	public $name = 'Audit';
+  public $name = 'Audit';
 
-	public $fields = array(
+  public $fields = array(
     'id'          => array( 'type' => 'string', 'length' => 36, 'null' => false ),
     'event'       => array( 'type' => 'string', 'length' => 255, 'null' => false ),
     'model'       => array( 'type' => 'string', 'length' => 255, 'null' => false ),
@@ -12,13 +12,13 @@ class AuditFixture extends CakeTestFixture {
     'description' => array( 'type' => 'text' ),
     'source_id'   => array( 'type' => 'string', 'length' => 255 ),
     'created'     => array( 'type' => 'datetime' ),
-	);
+  );
 
-/**
- * records property
- *
- * @var array
- * @access public
- */
-	var $records = array();
+  /**
+   * records property
+   *
+   * @var array
+   * @access public
+   */
+  public $records = array();
 }
