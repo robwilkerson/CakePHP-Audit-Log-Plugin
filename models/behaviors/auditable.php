@@ -226,7 +226,7 @@ class AuditableBehavior extends ModelBehavior {
      * call.
      */
     if( isset( $this->_original ) ) {
-      $this->_original = array();
+      unset( $this->_original[$model->alias] );
     }
   }
   
