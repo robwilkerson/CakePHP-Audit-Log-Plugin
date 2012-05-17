@@ -114,10 +114,13 @@ class AuditableBehaviorTest extends CakeTestCase {
     
     # Verify that no delta record was created.
     $this->assertTrue( empty( $deltas ) );
+  }
 
-    # TEST SAVEALL
-
-    # With model and one associated record
+  /** 
+   * Test saving multiple records with Model::saveAll()
+   */
+  public function testSaveAll() {
+    # TEST A MODEL AND A SINGLE ASSOCIATED MODEL
     $data = array(
       'Article' => array(
         'user_id'   => 1,
@@ -135,7 +138,6 @@ class AuditableBehaviorTest extends CakeTestCase {
     $article_audit = ClassRegistry::init( 'Audit' )->find(
       'first',
       array(
-        'recursive'  => -1,
         'conditions'        => array(
           'Audit.event'     => 'CREATE',
           'Audit.model'     => 'Article',
@@ -151,12 +153,11 @@ class AuditableBehaviorTest extends CakeTestCase {
     $this->assertEqual( 'Y', $article['Article']['published'] );
     
     # Verify that no delta record was created.
-    $this->assertTrue( !isset( $article_audit['AuditDelta'] ) );
+    $this->assertTrue( empty( $article_audit['AuditDelta'] ) );
 
     $author_audit = ClassRegistry::init( 'Audit' )->find(
       'first',
       array(
-        'recursive'  => -1,
         'conditions'        => array(
           'Audit.event'     => 'CREATE',
           'Audit.model'     => 'Author',
@@ -171,7 +172,77 @@ class AuditableBehaviorTest extends CakeTestCase {
     $this->assertEqual( 'Rob', $author['Author']['first_name'] );
     
     # Verify that no delta record was created.
-    $this->assertTrue( !isset( $author_audit['AuditDelta'] ) );
+    $this->assertTrue( empty( $author_audit['AuditDelta'] ) );
+
+    # TEST MULTIPLE RECORDS OF ONE MODEL
+
+    $data = array(
+        array(
+          'Article' => array(
+            'user_id'   => 1,
+            'author_id' => 1,
+            'title'     => 'Multiple Save 1 Title', 
+            'body'      => 'Multiple Save 1 Body', 
+            'published' => 'Y', 
+          ),
+        ),
+        array(
+          'Article' => array(
+            'user_id'       => 2,
+            'author_id'     => 2,
+            'title'         => 'Multiple Save 2 Title', 
+            'body'          => 'Multiple Save 2 Body', 
+            'published'     => 'N', 
+            'ignored_field' => 1,
+          )
+        ),        
+        array(
+          'Article' => array(
+            'user_id'   => 3,
+            'author_id' => 3,
+            'title'     => 'Multiple Save 3 Title', 
+            'body'      => 'Multiple Save 3 Body', 
+            'published' => 'Y', 
+          )
+        ),
+    );
+    $this->Article->create();
+    $this->Article->saveAll( $data ); 
+
+    # Retrieve the audits for the last 3 articles saved
+    $audits = ClassRegistry::init( 'Audit' )->find(
+      'all',
+      array(
+        'conditions'        => array(
+          'Audit.event'     => 'CREATE',
+          'Audit.model'     => 'Article',
+        ),
+        'order' => array( 'Audit.entity_id DESC' ),
+        'limit' => 3
+      )
+    );
+
+    $article_1 = json_decode( $audits[2]['Audit']['json_object'], true );
+    $article_2 = json_decode( $audits[1]['Audit']['json_object'], true );
+    $article_3 = json_decode( $audits[0]['Audit']['json_object'], true );
+
+    # Verify the audit records
+    $this->assertEqual( 1, $article_1['Article']['user_id'] );
+    $this->assertEqual( 'Multiple Save 1 Title', $article_1['Article']['title'] );
+    $this->assertEqual( 'Y', $article_1['Article']['published'] );
+    
+    $this->assertEqual( 2, $article_2['Article']['user_id'] );
+    $this->assertEqual( 'Multiple Save 2 Title', $article_2['Article']['title'] );
+    $this->assertEqual( 'N', $article_2['Article']['published'] );
+    
+    $this->assertEqual( 3, $article_3['Article']['user_id'] );
+    $this->assertEqual( 'Multiple Save 3 Title', $article_3['Article']['title'] );
+    $this->assertEqual( 'Y', $article_3['Article']['published'] );
+    
+    # Verify that no delta records were created.
+    $this->assertTrue( empty( $audits[0]['AuditDelta'] ) );
+    $this->assertTrue( empty( $audits[1]['AuditDelta'] ) );
+    $this->assertTrue( empty( $audits[2]['AuditDelta'] ) );
   }
   
   /**
