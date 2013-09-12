@@ -67,7 +67,7 @@ class AuditableBehaviorTest extends CakeTestCase {
    *
    * @access public
    */
-  public function startTest() {
+  public function setUp() {
     $this->Article = ClassRegistry::init( 'Article' );
   }
   
@@ -76,7 +76,7 @@ class AuditableBehaviorTest extends CakeTestCase {
    *
    * @access public
    */
-  public function endTest() {
+  public function tearDown() {
     unset( $this->Article );
 
     ClassRegistry::flush();
@@ -365,15 +365,24 @@ class AuditableBehaviorTest extends CakeTestCase {
 
     # There are 4 changes, but one to an ignored field
     $this->assertEqual( 3, count( $last_audit['AuditDelta'] ) );
-    $this->assertEqual( 'Second Test Article', array_shift( Set::extract( '/AuditDelta[property_name=title]/old_value', $last_audit ) ) );
-    $this->assertEqual( 'Second Test Article (Newly Edited)', array_shift( Set::extract( '/AuditDelta[property_name=title]/new_value', $last_audit ) ) );
-    
-    $this->assertEqual( 'Second Test Article Body', array_shift( Set::extract( '/AuditDelta[property_name=body]/old_value', $last_audit ) ) );
-    $this->assertEqual( 'Second Test Article Body (Also Edited)', array_shift( Set::extract( '/AuditDelta[property_name=body]/new_value', $last_audit ) ) );
-    
-    $this->assertEqual( 'N', array_shift( Set::extract( '/AuditDelta[property_name=published]/old_value', $last_audit ) ) );
-    $this->assertEqual( 'Y', array_shift( Set::extract( '/AuditDelta[property_name=published]/new_value', $last_audit ) ) );
-    
+    $result = Set::extract( '/AuditDelta[property_name=title]/old_value', $last_audit );
+    $this->assertEqual( 'Second Test Article', array_shift( $result ) );
+
+    $result = Set::extract( '/AuditDelta[property_name=title]/new_value', $last_audit );
+    $this->assertEqual( 'Second Test Article (Newly Edited)', array_shift( $result ) );
+
+    $result = Set::extract( '/AuditDelta[property_name=body]/old_value', $last_audit );
+    $this->assertEqual( 'Second Test Article Body', array_shift( $result ) );
+
+    $result = Set::extract( '/AuditDelta[property_name=body]/new_value', $last_audit );
+    $this->assertEqual( 'Second Test Article Body (Also Edited)', array_shift( $result ) );
+
+    $result = Set::extract( '/AuditDelta[property_name=published]/old_value', $last_audit );
+    $this->assertEqual( 'N', array_shift( $result ) );
+
+    $result = Set::extract( '/AuditDelta[property_name=published]/new_value', $last_audit );
+    $this->assertEqual( 'Y', array_shift( $result ) );
+
     # No delta should be reported against the ignored field.
     $this->assertIdentical( array(), Set::extract( '/AuditDelta[property_name=ignored_field]', $last_audit ) );
   }
