@@ -252,6 +252,7 @@ class AuditableBehavior extends ModelBehavior {
         'entity_id'   => $Model->id,
         'json_object' => json_encode( $audit ),
         'source_id'   => isset( $source['id'] ) ? $source['id'] : null
+        'description' => isset( $source['description'] ) ? $source['description'] : null,
       )
     );
     
