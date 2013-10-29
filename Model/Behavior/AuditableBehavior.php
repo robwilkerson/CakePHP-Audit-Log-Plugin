@@ -62,7 +62,7 @@ class AuditableBehavior extends ModelBehavior {
    *
    * @return  boolean
    */
-  public function beforeSave( Model $Model ) {
+  public function beforeSave( Model $Model, $options = array() ) {
     # If we're editing an existing object, save off a copy of
     # the object as it exists before any changes.
     if( !empty( $Model->id ) ) {
@@ -99,7 +99,7 @@ class AuditableBehavior extends ModelBehavior {
    *                    insertion. False otherwise.
    * @return  void
    */
-  public function afterSave( Model $Model, $created ) {
+  public function afterSave( Model $Model, $created , $options = array() ) {
     $audit = array( $Model->alias => $this->_getModelData( $Model ) );
     $audit[$Model->alias][$Model->primaryKey] = $Model->id;
 
