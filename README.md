@@ -33,7 +33,7 @@ To create tables you can use schema shell. To create tables execute:
 
     cd <path_to>/app/
     chmod +x ./Console/cake
-    ./Console/cake schema create --plugin AuditLog --name AuditLog
+    ./Console/cake schema create -p AuditLog
 
 ### CakePHP 1.3.x
 
