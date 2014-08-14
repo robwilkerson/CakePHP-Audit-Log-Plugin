@@ -275,6 +275,11 @@ class AuditableBehavior extends ModelBehavior {
    */
   private function _getModelData( Model $Model ) {
     /*
+     * turn cacheQueries off for model provided.
+     */
+    $Model->cacheQueries = false;
+
+    /*
      * Retrieve the model data along with its appropriate HABTM
      * model data.
      */
