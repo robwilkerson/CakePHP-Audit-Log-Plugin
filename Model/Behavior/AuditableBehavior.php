@@ -13,6 +13,18 @@ class AuditableBehavior extends ModelBehavior {
   private $_original = array();
 
   /**
+  * The request_id, a unique ID generated once per request to allow multiple record changes to be grouped by request
+  */
+  private static $_request_id = null;
+  private function request_id() {
+    if (empty(self::$_request_id)) {
+      self::$_request_id = String::uuid();
+    }
+
+    return self::$_request_id;
+  }
+
+  /**
    * Initiate behavior for the model using specified settings.
    *
    * Available settings:
@@ -131,6 +143,7 @@ class AuditableBehavior extends ModelBehavior {
         'event'     => $created ? 'CREATE' : 'EDIT',
         'model'     => $Model->alias,
         'entity_id' => $Model->id,
+		'request_id' => self::request_id(),
         'json_object' => json_encode( $audit ),
         'source_id' => isset( $source['id'] ) ? $source['id'] : null,
         'description' => isset( $source['description'] ) ? $source['description'] : null,
@@ -250,6 +263,7 @@ class AuditableBehavior extends ModelBehavior {
         'event'       => 'DELETE',
         'model'       => $Model->alias,
         'entity_id'   => $Model->id,
+		'request_id' => self::request_id(),
         'json_object' => json_encode( $audit ),
         'source_id'   => isset( $source['id'] ) ? $source['id'] : null,
         'description' => isset( $source['description'] ) ? $source['description'] : null,
