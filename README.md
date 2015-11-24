@@ -29,11 +29,15 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 1. `$ git submodule init`
 1. `$ git submodule update`
 
+#### Setup Database
+
 To create tables you can use schema shell. To create tables execute:
 
     cd <path_to>/app/
     chmod +x ./Console/cake
     ./Console/cake schema create -p AuditLog
+
+This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
 
 ### CakePHP 1.3.x
 
@@ -41,25 +45,23 @@ For use with CakePHP 1.3.x, be sure to use code from the `1.3` branch and follow
 
 ### Next Steps
 
-1. Run the `install.sql` file on your CakePHP application database. This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
 1. Create a `currentUser()` method, if desired.
 
     The `AuditableBehavior` optionally allows each changeset to be "owned" by a "source" -- typically the user responsible for the change. Since user and authentication models vary widely, the behavior supports a callback method that should return the value to be stored as the source of the change, if any.
 
-    The `currentUser()` method must be available to every model that cares to track a source of changes, so I recommend that a copy of CakePHP's `app_model.php` file be created and the method added there. Keep it DRY, right?
+    The `currentUser()` method must be available to every model that cares to track a source of changes, so I recommend that a copy of CakePHP's `AppModel.php` file be created and the method added there. Keep it DRY, right?
 
 	Storing the changeset source can be a little tricky if the core `Auth` component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in `AppController::beforeFilter()`:
 	
-        if( !empty( $this->data ) && empty( $this->data[$this->Auth->userModel] ) ) {
-          $this->data[$this->Auth->userModel] = $this->currentUser();
+        if( !empty( $this->request->data ) && empty( $this->request->data[$this->Auth->userModel] ) ) {
+          $user['User']['id'] = $this->Auth->user('id');
+          $this->request->data[$this->Auth->userModel] =  $user;
         }
 
     The behavior expects the `currentUser()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
 
-        protected function currentUser() {
-          $user = $this->Auth->user();
-          
-          return $user[$this->Auth->userModel]; # Return the complete user array
+        public function currentUser() {
+          return AuthComponent::user();
         }
   
 1. Attach the behavior to any desired model and configure.
