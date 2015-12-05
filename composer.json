@@ -1,19 +1,19 @@
 {
-  "name": "robwilkerson/CakePHP-Audit-Log-Plugin",
-  "type": "cakephp-plugin",
-  "description": "Audit Plugin for CakePHP",
-  "keywords": ["cakephp","auditlog"],
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Rob Wilkerson",
-      "homepage": "http://robwilkerson.org/"
-    }
-  ],
-  "require": {
-    "composer/installers": "*"
-  },
-  "extra": {
-    "installer-name": "AuditLog"
-  }
+    "name": "robwilkerson/CakePHP-Audit-Log-Plugin",
+    "type": "cakephp-plugin",
+    "description": "Audit Plugin for CakePHP",
+    "keywords": ["cakephp","auditlog"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Rob Wilkerson",
+            "homepage": "http://robwilkerson.org/"
+        }
+    ],
+    "require": {
+        "composer/installers": "*"
+    },
+    "extra": {
+        "installer-name": "AuditLog"
+	}
 }
