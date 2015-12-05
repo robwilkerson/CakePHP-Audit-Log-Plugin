@@ -16,9 +16,11 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 
 ## Installation
 
-### CakePHP >= 2.0
+### CakePHP >= 3.0
 
-#### As an Archive  
+The `master` branch is now dedicated to any CakePHP 3.x development. If you're making changes for use with prior versions, please use the appropriate branch.
+
+#### As an Archive
 
 1. Click the big ol' **Downloads** button next to the project description.
 1. Extract the archive to `app/Plugin/AuditLog`.
@@ -39,6 +41,10 @@ To create tables you can use schema shell. To create tables execute:
 
 This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
 
+### CakePHP >= 2.0
+
+For use with CakePHP 2.x, be sure to use code from the `2.x` branch and follow the instructions in that README file.
+
 ### CakePHP 1.3.x
 
 For use with CakePHP 1.3.x, be sure to use code from the `1.3` branch and follow the instructions in that README file.
@@ -52,7 +58,7 @@ For use with CakePHP 1.3.x, be sure to use code from the `1.3` branch and follow
     The `currentUser()` method must be available to every model that cares to track a source of changes, so I recommend that a copy of CakePHP's `AppModel.php` file be created and the method added there. Keep it DRY, right?
 
 	Storing the changeset source can be a little tricky if the core `Auth` component is being used since user data isn't readily available at the model layer where behaviors lie. One option is to forward that data from the controller. One means of doing this is to include the following code in `AppController::beforeFilter()`:
-	
+
         if( !empty( $this->request->data ) && empty( $this->request->data[$this->Auth->userModel] ) ) {
           $user['User']['id'] = $this->Auth->user('id');
           $this->request->data[$this->Auth->userModel] =  $user;
@@ -63,7 +69,7 @@ For use with CakePHP 1.3.x, be sure to use code from the `1.3` branch and follow
         public function currentUser() {
           return AuthComponent::user();
         }
-  
+
 1. Attach the behavior to any desired model and configure.
 
 ## Usage
@@ -82,12 +88,12 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
     # Simple syntax accepting default options
     class Task extends AppModel {
       public $actsAs = array( 'AuditLog.Auditable' );
-          
-      # 
+
+      #
       # Additional model code.
       #
     }
-    
+
     # Syntax with explicit options
     class Task extends AppModel {
       public $actsAs = array(
@@ -96,15 +102,15 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
           'habtm'  => array( 'Type', 'Project' )
         )
       );
-      
-      # 
+
+      #
       # Additional model code.
       #
     }
 
 ## Limitations
 
-* The master branch is not backwards compatible with CakePHP <=1.3.x. If you need compatibility with these version please install the code from the `1.3` branch and follow the instructions in that README. 
+* The master branch is not backwards compatible with CakePHP <=1.3.x. If you need compatibility with these version please install the code from the `1.3` branch and follow the instructions in that README.
 
 ## License
 
