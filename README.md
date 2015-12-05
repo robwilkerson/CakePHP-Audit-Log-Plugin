@@ -29,6 +29,33 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 1. `$ git submodule init`
 1. `$ git submodule update`
 
+#### Using Composer
+
+From your `/app/` folder run:
+
+```sh
+$ composer require robwilkerson/CakePHP-Audit-Log-Plugin:dev-master
+```    
+
+Done! This will automatically update `composer.json` and download the required pacakges.
+
+
+However, should the above fail to work, edit your `/app/composer.json` file and add the following:
+
+    {
+	    "require": {
+		    "robwilkerson/CakePHP-Audit-Log-Plugin": "dev-master"
+	    }
+    }
+
+Then run 
+
+`$ composer update`
+ 
+
+
+ 
+
 #### Setup Database
 
 To create tables you can use schema shell. To create tables execute:
