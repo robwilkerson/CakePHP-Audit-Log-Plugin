@@ -18,7 +18,9 @@ class AuditableBehavior extends ModelBehavior {
   private static $_request_id = null;
   private function request_id() {
     if (empty(self::$_request_id)) {
-      self::$_request_id = String::uuid();
+        // Class 'String' was deprecated in CakePHP 2.7 and replaced by 'CakeText'. See also: https://github.com/robwilkerson/CakePHP-Audit-Log-Plugin/issues/41
+        $UuidClass = class_exists('CakeText') ? 'CakeText' : 'String';
+        self::$_request_id = $UuidClass::uuid();
     }
 
     return self::$_request_id;
