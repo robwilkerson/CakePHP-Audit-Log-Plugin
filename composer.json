@@ -1,0 +1,23 @@
+{
+  "name": "xhs345/AuditLog",
+  "description": "AuditLog plugin for CakePHP",
+  "type": "cakephp-plugin",
+  "require": {
+    "php": ">=5.4.16",
+    "cakephp/cakephp": "~3.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "AuditLog\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AuditLog\\Test\\": "tests",
+      "Cake\\Test\\": "./vendor/cakephp/cakephp/tests"
+    }
+  }
+}
