@@ -14,11 +14,22 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 * Fully compatible with the [`PolymorphicBehavior`](http://bakery.cakephp.org/articles/view/polymorphic-behavior).
 * Does not require or rely on the existence of explicit models revisions (`AuditLog`) and deltas (`AuditLogDeltas`).
 
-## Installation
+## Versions
+
+### CakePHP 1.3.x
+
+Use code from the `1.3` branch and follow the instructions in that README file.
+
+### CakePHP 2.x
+
+Use the current master branch or use code from the `2.x` branch and follow the instructions in that README file.
 
 ### CakePHP >= 3.0
 
-The `master` branch is now dedicated to any CakePHP 3.x development. If you're making changes for use with prior versions, please use the appropriate branch.
+The `dev-3.x` branch is now dedicated to any CakePHP 3.x development and is still WIP. 
+
+
+## Installation (2.x)
 
 #### As an Archive
 
@@ -55,7 +66,6 @@ Then run
 `$ composer update`
  
 
-
  
 
 #### Setup Database
@@ -68,13 +78,6 @@ To create tables you can use schema shell. To create tables execute:
 
 This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
 
-### CakePHP >= 2.0
-
-For use with CakePHP 2.x, be sure to use code from the `2.x` branch and follow the instructions in that README file.
-
-### CakePHP 1.3.x
-
-For use with CakePHP 1.3.x, be sure to use code from the `1.3` branch and follow the instructions in that README file.
 
 ### Next Steps
 
@@ -135,9 +138,6 @@ Applying the `AuditableBehavior` to a model is essentially the same as applying 
       #
     }
 
-## Limitations
-
-* The master branch is not backwards compatible with CakePHP <=1.3.x. If you need compatibility with these version please install the code from the `1.3` branch and follow the instructions in that README.
 
 ## License
 
