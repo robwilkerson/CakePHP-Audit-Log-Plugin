@@ -21,7 +21,7 @@ Or alternatively use git to clone this branch in the appropriate path
 To create tables you can use migrations. To create tables execute:
 
     cd <path_to_project>
-    bin/cake migrations migrate
+    bin/cake migrations migrate -p AuditLog
 
 This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
 
