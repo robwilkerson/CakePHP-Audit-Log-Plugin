@@ -183,6 +183,15 @@ class AuditableBehavior extends ModelBehavior {
           );
           array_push( $updates, $delta );
         }
+      } else {
+          $delta = array(
+              'AuditDelta' => array(
+                  'property_name' => $property,
+                  'old_value'     => '',
+                  'new_value'     => $value
+              )
+          );
+          array_push( $updates, $delta );
       }
     }
 
