@@ -82,10 +82,10 @@ class AuditableBehavior extends ModelBehavior {
     if( !empty( $Model->id ) ) {
       $this->_original[$Model->alias] = $this->_getModelData( $Model );
     }
-    
+
     return true;
   }
-  
+
   /**
    * Executed before a delete() operation.
    *
@@ -101,7 +101,7 @@ class AuditableBehavior extends ModelBehavior {
       )
     );
     $this->_original[$Model->alias] = $original[$Model->alias];
-    
+
     return true;
   }
 
@@ -127,7 +127,7 @@ class AuditableBehavior extends ModelBehavior {
     $Model->Audit->bindModel(
       array( 'hasMany' => array( 'AuditDelta' ) )
     );
-    
+
     /*
      * If a currentUser() method exists in the model class (or, of
      * course, in a superclass) the call that method to pull all user
@@ -139,7 +139,7 @@ class AuditableBehavior extends ModelBehavior {
     } else if ( $Model->hasMethod( 'current_user' ) ) {
       $source = $Model->current_user();
     }
-    
+
     $data = array(
       'Audit' => array(
         'event'     => $created ? 'CREATE' : 'EDIT',
@@ -168,8 +168,19 @@ class AuditableBehavior extends ModelBehavior {
         continue;
       }
 
-      if( !$created ) {
-        if( array_key_exists( $property, $this->_original[$Model->alias] ) && $this->_original[$Model->alias][$property] != $value ) {
+      if( $created ) {
+      	if ( !empty( $value ) ) {
+          $delta = array(
+            'AuditDelta' => array(
+              'property_name' => $property,
+              'old_value'     => '',
+              'new_value'     => $value
+            )
+          );
+      	}
+      } else {
+	      if( array_key_exists( $property, $this->_original[$Model->alias] ) 
+          && $this->_original[$Model->alias][$property] != $value ) {
           /*
            * If the property exists in the original _and_ the
            * value is different, store it.
@@ -181,8 +192,10 @@ class AuditableBehavior extends ModelBehavior {
               'new_value'     => $value
             )
           );
-          array_push( $updates, $delta );
         }
+      }
+      if ( !empty( $delta ) ) {
+          array_push( $updates, $delta );
       }
     }
 
@@ -203,7 +216,7 @@ class AuditableBehavior extends ModelBehavior {
         }
       }
     }
-    
+
     # Insert a delta record if something changed.
     if( count( $updates ) ) {
       foreach( $updates as $delta ) {
@@ -237,9 +250,9 @@ class AuditableBehavior extends ModelBehavior {
     if( isset( $this->_original ) ) {
       unset( $this->_original[$Model->alias] );
     }
-    return true;    
+    return true;
   }
-  
+
   /**
    * Executed after a model is deleted.
    *
@@ -258,7 +271,7 @@ class AuditableBehavior extends ModelBehavior {
     } else if ( $Model->hasMethod( 'current_user' ) ) {
       $source = $Model->current_user();
     }
-    
+
     $audit = array( $Model->alias => $this->_original[$Model->alias] );
     $data  = array(
       'Audit' => array(
@@ -271,7 +284,7 @@ class AuditableBehavior extends ModelBehavior {
         'description' => isset( $source['description'] ) ? $source['description'] : null,
       )
     );
-    
+
     $this->Audit = ClassRegistry::init( 'Audit' );
     $this->Audit->create();
     $this->Audit->save( $data );
