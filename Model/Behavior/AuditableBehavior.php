@@ -168,8 +168,19 @@ class AuditableBehavior extends ModelBehavior {
         continue;
       }
 
-      if( !$created ) {
-        if( array_key_exists( $property, $this->_original[$Model->alias] ) && $this->_original[$Model->alias][$property] != $value ) {
+      if( $created ) {
+      	if ( !empty( $value ) ) {
+          $delta = array(
+            'AuditDelta' => array(
+              'property_name' => $property,
+              'old_value'     => '',
+              'new_value'     => $value
+            )
+          );
+      	}
+      } else {
+	      if( array_key_exists( $property, $this->_original[$Model->alias] ) 
+          && $this->_original[$Model->alias][$property] != $value ) {
           /*
            * If the property exists in the original _and_ the
            * value is different, store it.
@@ -181,19 +192,10 @@ class AuditableBehavior extends ModelBehavior {
               'new_value'     => $value
             )
           );
-          array_push( $updates, $delta );
         }
-      } else {
-        if ( !empty( $value ) && $value != '' ) {
-          $delta = array(
-            'AuditDelta' => array(
-              'property_name' => $property,
-              'old_value'     => '',
-              'new_value'     => $value
-            )
-          );
+      }
+      if ( !empty( $delta ) ) {
           array_push( $updates, $delta );
-        }
       }
     }
 
