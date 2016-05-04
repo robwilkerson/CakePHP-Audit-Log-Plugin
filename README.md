@@ -58,15 +58,13 @@ However, should the above fail to work, edit your `/app/composer.json` file and 
     {
 	    "require": {
 		    "robwilkerson/CakePHP-Audit-Log-Plugin": "dev-master"
+		    "robwilkerson/CakePHP-Audit-Log-Plugin": "dev-2.x"
 	    }
     }
 
 Then run 
 
 `$ composer update`
- 
-
- 
 
 #### Setup Database
 

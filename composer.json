@@ -1,5 +1,5 @@
 {
-    "name": "robwilkerson/cakephp-audit-log-plugin",
+    "name": "robwilkerson/CakePHP-Audit-Log-Plugin",
     "type": "cakephp-plugin",
     "description": "Audit Plugin for CakePHP",
     "keywords": ["cakephp","auditlog"],
@@ -15,5 +15,5 @@
     },
     "extra": {
         "installer-name": "AuditLog"
-	}    
+	}
 }
