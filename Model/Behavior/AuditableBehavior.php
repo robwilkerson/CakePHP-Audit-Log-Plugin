@@ -338,7 +338,7 @@ class AuditableBehavior extends ModelBehavior {
 
     foreach( $this->settings[$Model->alias]['habtm'] as $habtm_model ) {
       if( array_key_exists( $habtm_model, $Model->hasAndBelongsToMany ) && isset( $data[$habtm_model] ) ) {
-        $habtm_ids = Set::combine(
+        $habtm_ids = Hash::combine(
           $data[$habtm_model],
           '{n}.id',
           '{n}.id'
