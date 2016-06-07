@@ -66,6 +66,10 @@ Then run
 
 `$ composer update`
 
+#### Load the Plugin
+
+In ``app/Config/bootstrap.php`` add the line ``CakePlugin::load('AuditLog');``.
+
 #### Setup Database
 
 To create tables you can use schema shell. To create tables execute:
@@ -75,7 +79,6 @@ To create tables you can use schema shell. To create tables execute:
     ./Console/cake schema create -p AuditLog
 
 This will create the `audits` and `audit_deltas` tables that will store each object's relevant change history.
-
 
 ### Next Steps
 
