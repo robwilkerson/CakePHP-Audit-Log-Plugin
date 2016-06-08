@@ -28,7 +28,6 @@ Use the current master branch or use code from the `2.x` branch and follow the i
 
 The `dev-3.x` branch is now dedicated to any CakePHP 3.x development and is still WIP. 
 
-
 ## Installation (2.x)
 
 #### As an Archive
@@ -52,19 +51,9 @@ $ composer require robwilkerson/CakePHP-Audit-Log-Plugin:dev-master
 
 Done! This will automatically update `composer.json` and download the required pacakges.
 
-
-However, should the above fail to work, edit your `/app/composer.json` file and add the following:
-
-    {
-	    "require": {
-		    "robwilkerson/CakePHP-Audit-Log-Plugin": "dev-master"
-		    "robwilkerson/CakePHP-Audit-Log-Plugin": "dev-2.x"
-	    }
-    }
-
 Then run 
 
-`$ composer update`
+`$ composer install`
 
 #### Setup Database
 
