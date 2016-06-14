@@ -3,7 +3,8 @@
 /**
  * Records changes made to an object during save operations.
  */
-class AuditableBehavior extends ModelBehavior {
+class AuditableBehavior extends ModelBehavior
+{
   /**
    * A copy of the object as it existed prior to the save. We're going
    * to store this off so we can calculate the deltas after save.
@@ -16,9 +17,10 @@ class AuditableBehavior extends ModelBehavior {
   * The request_id, a unique ID generated once per request to allow multiple record changes to be grouped by request
   */
   private static $_request_id = null;
+
   private function request_id() {
     if (empty(self::$_request_id)) {
-        // Class 'String' was deprecated in CakePHP 2.7 and replaced by 'CakeText'. See also: https://github.com/robwilkerson/CakePHP-Audit-Log-Plugin/issues/41
+        // Class 'String' was deprecated in CakePHP 2.7 and replaced by 'CakeText' (Issue #41)
         $UuidClass = class_exists('CakeText') ? 'CakeText' : 'String';
         self::$_request_id = $UuidClass::uuid();
     }
@@ -65,7 +67,9 @@ class AuditableBehavior extends ModelBehavior {
        * Note the "===" in the condition. The type check is important,
        * so don't change it just because it may look like a mistake.
        */
-      if( !array_key_exists( $model_name, $Model->hasAndBelongsToMany ) || ( is_array($Model->$model_name->actsAs) && array_search( 'Auditable', $Model->$model_name->actsAs ) === true ) ) {
+      if( !array_key_exists( $model_name, $Model->hasAndBelongsToMany )
+          || ( is_array($Model->$model_name->actsAs)
+              && array_search( 'Auditable', $Model->$model_name->actsAs ) === true ) ) {
         unset( $this->settings[$Model->alias]['habtm'][$index] );
       }
     }
@@ -111,10 +115,12 @@ class AuditableBehavior extends ModelBehavior {
    *
    * @param   $created  Boolean. True if the save operation was an
    *                    insertion. False otherwise.
-   * @return  void
+   * @return  boolean
    */
-  public function afterSave( Model $Model, $created , $options = array() ) {
-    if (!$modelData=$this->_getModelData($Model)){
+  public function afterSave( Model $Model, $created , $options = array() )
+  {
+    $modelData = $this->_getModelData($Model);
+    if (!$modelData) {
       $this->afterDelete($Model);
       return true;
     }
@@ -150,7 +156,7 @@ class AuditableBehavior extends ModelBehavior {
         'event'     => $created ? 'CREATE' : 'EDIT',
         'model'     => $Model->alias,
         'entity_id' => $Model->id,
-		'request_id' => self::request_id(),
+        'request_id' => self::request_id(),
         'json_object' => json_encode( $audit ),
         'source_id' => isset( $source['id'] ) ? $source['id'] : null,
         'description' => isset( $source['description'] ) ? $source['description'] : null,
