@@ -78,6 +78,8 @@ class AuditableBehavior extends ModelBehavior
   /**
    * Executed before a save() operation.
    *
+   * @param $Model
+   * @param array $options
    * @return  boolean
    */
   public function beforeSave( Model $Model, $options = array() ) {
@@ -93,8 +95,8 @@ class AuditableBehavior extends ModelBehavior
   /**
    * Executed before a delete() operation.
    *
-   * @param 	$Model
-   * @return	boolean
+   * @param $Model
+   * @return boolean
    */
   public function beforeDelete( Model $Model, $cascade = true ) {
     $original = $Model->find(
@@ -113,7 +115,8 @@ class AuditableBehavior extends ModelBehavior
    * function afterSave
    * Executed after a save operation completes.
    *
-   * @param   $created  Boolean. True if the save operation was an
+   * @param mixed $Model The Model that is used for the save operation
+   * @param boolean $created True if the save operation was an
    *                    insertion. False otherwise.
    * @return  boolean
    */
@@ -180,7 +183,7 @@ class AuditableBehavior extends ModelBehavior
       }
 
       if( $created ) {
-      	if ( !empty( $value ) ) {
+        if ( !empty( $value ) ) {
           $delta = array(
             'AuditDelta' => array(
               'property_name' => $property,
@@ -188,9 +191,9 @@ class AuditableBehavior extends ModelBehavior
               'new_value'     => $value
             )
           );
-      	}
+        }
       } else {
-	      if( array_key_exists( $property, $this->_original[$Model->alias] ) 
+          if( array_key_exists( $property, $this->_original[$Model->alias] ) 
           && $this->_original[$Model->alias][$property] != $value ) {
           /*
            * If the property exists in the original _and_ the
@@ -267,8 +270,8 @@ class AuditableBehavior extends ModelBehavior
   /**
    * Executed after a model is deleted.
    *
-   * @param 	$Model
-   * @return	void
+   * @param  $Model
+   * @return void
    */
   public function afterDelete( Model $Model ) {
     /*
@@ -289,7 +292,7 @@ class AuditableBehavior extends ModelBehavior
         'event'       => 'DELETE',
         'model'       => $Model->alias,
         'entity_id'   => $Model->id,
-		'request_id' => self::request_id(),
+        'request_id' => self::request_id(),
         'json_object' => json_encode( $audit ),
         'source_id'   => isset( $source['id'] ) ? $source['id'] : null,
         'description' => isset( $source['description'] ) ? $source['description'] : null,
@@ -310,7 +313,7 @@ class AuditableBehavior extends ModelBehavior
    * Additionally, for the HABTM data, all we care about is the IDs,
    * so the data will be reduced to an indexed array of those IDs.
    *
-   * @param   $Model
+   * @param $Model
    * @return  array
    */
   private function _getModelData( Model $Model ) {
