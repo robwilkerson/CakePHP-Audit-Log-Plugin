@@ -300,12 +300,12 @@ class AuditableBehaviorTest extends CakeTestCase {
       'all',
       array(
         'recursive' => -1,
-        'conditions' => array( 'AuditDelta.audit_id' => Set::extract( '/Audit/id', $audit_records ) ),
+        'conditions' => array( 'AuditDelta.audit_id' => Hash::extract($audit_records, '{n}.Audit.id') ),
       )
     );
     
-    $create_audit = Set::extract( '/Audit[event=CREATE]', $audit_records );
-    $update_audit = Set::extract( '/Audit[event=EDIT]', $audit_records );
+    $create_audit = Hash::extract($audit_records, '{n}.Audit[event=CREATE]');
+    $update_audit = Hash::extract($audit_records, '{n}.Audit[event=EDIT]');
     
     # There should be 1 CREATE and 1 EDIT record
     $this->assertEqual( 2, count( $audit_records ) );
@@ -365,26 +365,26 @@ class AuditableBehaviorTest extends CakeTestCase {
 
     # There are 4 changes, but one to an ignored field
     $this->assertEqual( 3, count( $last_audit['AuditDelta'] ) );
-    $result = Set::extract( '/AuditDelta[property_name=title]/old_value', $last_audit );
+    $result = Hash::extract($last_audit, '{n}.AuditDelta[property_name=title].old_value');
     $this->assertEqual( 'Second Test Article', array_shift( $result ) );
 
-    $result = Set::extract( '/AuditDelta[property_name=title]/new_value', $last_audit );
+    $result = Hash::extract($last_audit, '{n}.AuditDelta[property_name=title].new_value');
     $this->assertEqual( 'Second Test Article (Newly Edited)', array_shift( $result ) );
 
-    $result = Set::extract( '/AuditDelta[property_name=body]/old_value', $last_audit );
+    $result = Hash::extract($last_audit, '{n}.AuditDelta[property_name=body].old_value');
     $this->assertEqual( 'Second Test Article Body', array_shift( $result ) );
 
-    $result = Set::extract( '/AuditDelta[property_name=body]/new_value', $last_audit );
+    $result = Hash::extract($last_audit, '{n}.AuditDelta[property_name=body].new_value');
     $this->assertEqual( 'Second Test Article Body (Also Edited)', array_shift( $result ) );
 
-    $result = Set::extract( '/AuditDelta[property_name=published]/old_value', $last_audit );
+    $result = Hash::extract($last_audit, '{n}.AuditDelta[property_name=published].old_value');
     $this->assertEqual( 'N', array_shift( $result ) );
 
-    $result = Set::extract( '/AuditDelta[property_name=published]/new_value', $last_audit );
+    $result = Hash::extract($last_audit, '{n}.AuditDelta[property_name=published].new_value');
     $this->assertEqual( 'Y', array_shift( $result ) );
 
     # No delta should be reported against the ignored field.
-    $this->assertIdentical( array(), Set::extract( '/AuditDelta[property_name=ignored_field]', $last_audit ) );
+    $this->assertIdentical( array(), Hash::extract($last_audit, '{n}.AuditDelta[property_name=ignored_field]') );
   }
   
   public function testIgnoredField() {
