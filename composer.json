@@ -15,6 +15,11 @@
         {
             "name": "Rob Wilkerson",
             "homepage": "http://robwilkerson.org/"
+        },
+        {
+            "name": "Other contributors",
+            "homepage": "https://github.com/robwilkerson/CakePHP-Audit-Log-Plugin/graphs/contributors",
+            "role": "Contributors"
         }
     ],
     "require": {
