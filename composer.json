@@ -2,7 +2,13 @@
     "name": "robwilkerson/CakePHP-Audit-Log-Plugin",
     "type": "cakephp-plugin",
     "description": "Audit Plugin for CakePHP",
-    "keywords": ["cakephp","auditlog"],
+    "keywords": [
+        "cakephp",
+        "auditlog",
+        "log",
+        "audit trail",
+        "audit"
+    ],
     "license": "MIT",
     "authors": [
         {
