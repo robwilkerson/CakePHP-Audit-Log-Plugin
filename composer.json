@@ -22,6 +22,10 @@
             "role": "Contributors"
         }
     ],
+    "support": {
+        "source": "https://github.com/robwilkerson/CakePHP-Audit-Log-Plugin",
+        "issues": "https://github.com/robwilkerson/CakePHP-Audit-Log-Plugin/issues"
+    },
     "require": {
         "composer/installers": "^1.0"
     },
