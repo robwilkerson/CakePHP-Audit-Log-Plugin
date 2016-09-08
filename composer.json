@@ -9,6 +9,7 @@
         "audit trail",
         "audit"
     ],
+    "homepage": "https://github.com/robwilkerson/CakePHP-Audit-Log-Plugin",
     "license": "MIT",
     "authors": [
         {
