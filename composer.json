@@ -13,6 +13,9 @@
     "require": {
         "composer/installers": "*"
     },
+    "require-dev": {
+        "cakephp/cakephp-codesniffer": "^1.0.0"
+    },
     "extra": {
         "installer-name": "AuditLog"
     }
