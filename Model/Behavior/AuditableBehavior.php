@@ -5,24 +5,24 @@
  */
 class AuditableBehavior extends \ModelBehavior {
 
-	/**
-	 * A copy of the object as it existed prior to the save. We're going
-	 * to store this off, so we can calculate the deltas after save.
-	 *
-	 * @var array
-	 */
+/**
+ * A copy of the object as it existed prior to the save. We're going
+ * to store this off, so we can calculate the deltas after save.
+ *
+ * @var array
+ */
 	protected $_original = array();
 
-	/**
-	 * The request_id, a unique ID generated once per request to allow multiple record changes to be grouped by request
-	 */
+/**
+ * The request_id, a unique ID generated once per request to allow multiple record changes to be grouped by request
+ */
 	protected static $_request_id = null;
 
-	/**
-	 *
-	 *
-	 * @return null
-	 */
+/**
+ * Get request ID
+ *
+ * @return null|string The request ID
+ */
 	protected function request_id() {
 		if (empty(self::$_request_id)) {
 			// Class 'String' was deprecated in CakePHP 2.7 and replaced by 'CakeText' (Issue #41)
@@ -33,21 +33,21 @@ class AuditableBehavior extends \ModelBehavior {
 		return self::$_request_id;
 	}
 
-	/**
-	 * Initiate behavior for the model using specified settings.
-	 *
-	 * Available settings:
-	 *   - ignore array, optional
-	 *            An array of property names to be ignored when records
-	 *            are created in the deltas table.
-	 *   - habtm  array, optional
-	 *            An array of models that have a HABTM relationship with
-	 *            the acting model and whose changes should be monitored
-	 *            with the model.
-	 *
-	 * @param   Model $Model Model using the behavior
-	 * @param   array $settings Settings overrides.
-	 */
+/**
+ * Initiate behavior for the model using specified settings.
+ *
+ * Available settings:
+ *   - ignore array, optional
+ *            An array of property names to be ignored when records
+ *            are created in the deltas table.
+ *   - habtm  array, optional
+ *            An array of models that have a HABTM relationship with
+ *            the acting model and whose changes should be monitored
+ *            with the model.
+ *
+ * @param   Model $Model Model using the behavior
+ * @param   array $settings Settings overrides.
+ */
 	public function setup(Model $Model, $settings = array()) {
 		if (!isset($this->settings[$Model->alias])) {
 			$this->settings[$Model->alias] = array(
@@ -81,13 +81,13 @@ class AuditableBehavior extends \ModelBehavior {
 		}
 	}
 
-	/**
-	 * Executed before a save() operation.
-	 *
-	 * @param $Model
-	 * @param array $options
-	 * @return  boolean
-	 */
+/**
+ * Executed before a save() operation.
+ *
+ * @param $Model
+ * @param array $options
+ * @return  boolean
+ */
 	public function beforeSave(Model $Model, $options = array()) {
 		// If we're editing an existing object, save off a copy of
 		// the object as it exists before any changes.
@@ -98,12 +98,12 @@ class AuditableBehavior extends \ModelBehavior {
 		return true;
 	}
 
-	/**
-	 * Executed before a delete() operation.
-	 *
-	 * @param $Model
-	 * @return boolean
-	 */
+/**
+ * Executed before a delete() operation.
+ *
+ * @param $Model
+ * @return boolean
+ */
 	public function beforeDelete(Model $Model, $cascade = true) {
 		$original = $Model->find(
 			'first',
@@ -117,15 +117,15 @@ class AuditableBehavior extends \ModelBehavior {
 		return true;
 	}
 
-	/**
-	 * function afterSave
-	 * Executed after a save operation completes.
-	 *
-	 * @param mixed $Model The Model that is used for the save operation
-	 * @param boolean $created True if the save operation was an
-	 *                    insertion. False otherwise.
-	 * @return  boolean
-	 */
+/**
+ * function afterSave
+ * Executed after a save operation completes.
+ *
+ * @param mixed $Model The Model that is used for the save operation
+ * @param boolean $created True if the save operation was an
+ *                    insertion. False otherwise.
+ * @return  boolean
+ */
 	public function afterSave(Model $Model, $created, $options = array()) {
 		$modelData = $this->_getModelData($Model);
 		if (!$modelData) {
@@ -275,12 +275,12 @@ class AuditableBehavior extends \ModelBehavior {
 		return true;
 	}
 
-	/**
-	 * Executed after a model is deleted.
-	 *
-	 * @param  $Model
-	 * @return void
-	 */
+/**
+ * Executed after a model is deleted.
+ *
+ * @param  $Model
+ * @return void
+ */
 	public function afterDelete(Model $Model) {
 		/*
 		 * If a currentUser() method exists in the model class (or, of
@@ -312,18 +312,18 @@ class AuditableBehavior extends \ModelBehavior {
 		$this->Audit->save($data);
 	}
 
-	/**
-	 * function _getModelData
-	 * Retrieves the entire set model data contained to the primary
-	 * object and any/all HABTM associated data that has been configured
-	 * with the behavior.
-	 *
-	 * Additionally, for the HABTM data, all we care about is the IDs,
-	 * so the data will be reduced to an indexed array of those IDs.
-	 *
-	 * @param $Model
-	 * @return  array
-	 */
+/**
+ * function _getModelData
+ * Retrieves the entire set model data contained to the primary
+ * object and any/all HABTM associated data that has been configured
+ * with the behavior.
+ *
+ * Additionally, for the HABTM data, all we care about is the IDs,
+ * so the data will be reduced to an indexed array of those IDs.
+ *
+ * @param $Model
+ * @return  array
+ */
 	protected function _getModelData(Model $Model) {
 		/*
 		 * turn cacheQueries off for model provided.
