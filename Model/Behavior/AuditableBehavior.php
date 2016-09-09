@@ -45,8 +45,9 @@ class AuditableBehavior extends \ModelBehavior {
  *            the acting model and whose changes should be monitored
  *            with the model.
  *
- * @param   Model $Model Model using the behavior
- * @param   array $settings Settings overrides.
+ * @param Model $Model Model using the behavior.
+ * @param array $settings Settings overrides.
+ * @return void
  */
 	public function setup(Model $Model, $settings = array()) {
 		if (!isset($this->settings[$Model->alias])) {
@@ -68,10 +69,8 @@ class AuditableBehavior extends \ModelBehavior {
 		 * any model which isn't a HABTM association.
 		 */
 		foreach ($this->settings[$Model->alias]['habtm'] as $index => $model_name) {
-			/**
-			 * Note the "===" in the condition. The type check is important,
-			 * so don't change it just because it may look like a mistake.
-			 */
+			// Note the "===" in the condition. The type check is important,
+			// so don't change it just because it may look like a mistake.
 			if (!array_key_exists($model_name, $Model->hasAndBelongsToMany)
 				|| (is_array($Model->$model_name->actsAs)
 					&& array_search('Auditable', $Model->$model_name->actsAs) === true)
@@ -84,9 +83,9 @@ class AuditableBehavior extends \ModelBehavior {
 /**
  * Executed before a save() operation.
  *
- * @param $Model
- * @param array $options
- * @return  boolean
+ * @param Model $Model Model using the behavior.
+ * @param array $options The options data.
+ * @return true Always true.
  */
 	public function beforeSave(Model $Model, $options = array()) {
 		// If we're editing an existing object, save off a copy of
@@ -101,8 +100,9 @@ class AuditableBehavior extends \ModelBehavior {
 /**
  * Executed before a delete() operation.
  *
- * @param $Model
- * @return boolean
+ * @param Model $Model Model using the behavior.
+ * @param bool $cascade Whether to cascade.
+ * @return true Always true.
  */
 	public function beforeDelete(Model $Model, $cascade = true) {
 		$original = $Model->find(
@@ -121,10 +121,10 @@ class AuditableBehavior extends \ModelBehavior {
  * function afterSave
  * Executed after a save operation completes.
  *
- * @param mixed $Model The Model that is used for the save operation
- * @param boolean $created True if the save operation was an
- *                    insertion. False otherwise.
- * @return  boolean
+ * @param Model $Model The model that is used for the save operation.
+ * @param bool $created True if the save operation was an insertion, false otherwise.
+ * @param array $options The options data.
+ * @return true Always true.
  */
 	public function afterSave(Model $Model, $created, $options = array()) {
 		$modelData = $this->_getModelData($Model);
@@ -156,7 +156,7 @@ class AuditableBehavior extends \ModelBehavior {
 		$source = array();
 		if ($Model->hasMethod('currentUser')) {
 			$source = $Model->currentUser();
-		} else if ($Model->hasMethod('current_user')) {
+		} elseif ($Model->hasMethod('current_user')) {
 			$source = $Model->current_user();
 		}
 
@@ -278,7 +278,7 @@ class AuditableBehavior extends \ModelBehavior {
 /**
  * Executed after a model is deleted.
  *
- * @param  $Model
+ * @param Model $Model The model that is used for the delete operation.
  * @return void
  */
 	public function afterDelete(Model $Model) {
@@ -290,7 +290,7 @@ class AuditableBehavior extends \ModelBehavior {
 		$source = array();
 		if ($Model->hasMethod('currentUser')) {
 			$source = $Model->currentUser();
-		} else if ($Model->hasMethod('current_user')) {
+		} elseif ($Model->hasMethod('current_user')) {
 			$source = $Model->current_user();
 		}
 
@@ -313,7 +313,8 @@ class AuditableBehavior extends \ModelBehavior {
 	}
 
 /**
- * function _getModelData
+ * Get model data
+ *
  * Retrieves the entire set model data contained to the primary
  * object and any/all HABTM associated data that has been configured
  * with the behavior.
@@ -321,8 +322,8 @@ class AuditableBehavior extends \ModelBehavior {
  * Additionally, for the HABTM data, all we care about is the IDs,
  * so the data will be reduced to an indexed array of those IDs.
  *
- * @param $Model
- * @return  array
+ * @param Model $Model The model that uses the behavior.
+ * @return  array The model data.
  */
 	protected function _getModelData(Model $Model) {
 		/*
