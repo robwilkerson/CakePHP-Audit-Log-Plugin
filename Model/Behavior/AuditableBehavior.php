@@ -11,19 +11,19 @@ class AuditableBehavior extends \ModelBehavior {
 	 *
 	 * @var array
 	 */
-	private $_original = array();
+	protected $_original = array();
 
 	/**
 	 * The request_id, a unique ID generated once per request to allow multiple record changes to be grouped by request
 	 */
-	private static $_request_id = null;
+	protected static $_request_id = null;
 
 	/**
 	 *
 	 *
 	 * @return null
 	 */
-	private function request_id() {
+	protected function request_id() {
 		if (empty(self::$_request_id)) {
 			// Class 'String' was deprecated in CakePHP 2.7 and replaced by 'CakeText' (Issue #41)
 			$UuidClass = class_exists('CakeText') ? 'CakeText' : 'String';
@@ -324,7 +324,7 @@ class AuditableBehavior extends \ModelBehavior {
 	 * @param $Model
 	 * @return  array
 	 */
-	private function _getModelData(Model $Model) {
+	protected function _getModelData(Model $Model) {
 		/*
 		 * turn cacheQueries off for model provided.
 		 */
