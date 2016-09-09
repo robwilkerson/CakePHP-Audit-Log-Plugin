@@ -134,7 +134,7 @@ class AuditableBehaviorTest extends CakeTestCase {
  * Test the action of creating a new record.
  *
  * @return void
- * @todo  Test HABTM save
+ * @todo Test HABTM save.
  */
 	public function testCreate() {
 		$newArticle = array(
@@ -174,7 +174,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$this->assertEqual('First Test Article', $article['Article']['title']);
 		$this->assertEqual('N', $article['Article']['published']);
 
-		//Verify that no delta record was created.
+		// Verify that no delta record was created.
 		$this->assertTrue(empty($deltas));
 	}
 
@@ -184,7 +184,7 @@ class AuditableBehaviorTest extends CakeTestCase {
  * @return void
  */
 	public function testSaveAll() {
-		// TEST A MODEL AND A SINGLE ASSOCIATED MODEL
+		// Test a model and a single associated model.
 		$data = array(
 			'Article' => array(
 				'user_id' => 1,
@@ -212,7 +212,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 		$article = json_decode($articleAudit['Audit']['json_object'], true);
 
-		// Verify the audit record
+		// Verify the audit record.
 		$this->assertEqual(1, $article['Article']['user_id']);
 		$this->assertEqual('Rob\'s Test Article', $article['Article']['title']);
 		$this->assertEqual('Y', $article['Article']['published']);
@@ -233,15 +233,14 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 		$author = json_decode($authorAudit['Audit']['json_object'], true);
 
-		// Verify the audit record
+		// Verify the audit record.
 		$this->assertEqual($article['Article']['author_id'], $author['Author']['id']);
 		$this->assertEqual('Rob', $author['Author']['first_name']);
 
 		// Verify that no delta record was created.
 		$this->assertTrue(!isset($authorAudit['AuditDelta']));
 
-		// TEST MULTIPLE RECORDS OF ONE MODEL
-
+		// Test multiple records of one model.
 		$data = array(
 			array(
 				'Article' => array(
@@ -275,7 +274,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$this->Article->create();
 		$this->Article->saveAll($data);
 
-		// Retrieve the audits for the last 3 articles saved
+		// Retrieve the audits for the last 3 articles saved.
 		$audits = ClassRegistry::init('Audit')->find(
 			'all',
 			array(
@@ -292,7 +291,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$article2 = json_decode($audits[1]['Audit']['json_object'], true);
 		$article3 = json_decode($audits[0]['Audit']['json_object'], true);
 
-		// Verify the audit records
+		// Verify the audit records.
 		$this->assertEqual(1, $article1['Article']['user_id']);
 		$this->assertEqual('Multiple Save 1 Title', $article1['Article']['title']);
 		$this->assertEqual('Y', $article1['Article']['published']);
@@ -333,8 +332,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 			),
 		);
 
-		// TEST SAVE WITH SINGLE PROPERTY UPDATE
-
+		// Test save with single property update.
 		$this->Article->save($newArticle);
 		$this->Article->saveField('title', 'First Test Article (Edited)');
 
@@ -359,25 +357,24 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$createAudit = Hash::extract($auditRecords, '{n}.Audit[event=CREATE]');
 		$updateAudit = Hash::extract($auditRecords, '{n}.Audit[event=EDIT]');
 
-		// There should be 1 CREATE and 1 EDIT record
+		// There should be 1 CREATE and 1 EDIT record.
 		$this->assertEqual(2, count($auditRecords));
 
 		// There should be one audit record for each event.
 		$this->assertEqual(1, count($createAudit));
 		$this->assertEqual(1, count($updateAudit));
 
-		// Only one property was changed
+		// Only one property was changed.
 		$this->assertEqual(1, count($deltaRecords));
 
 		$delta = array_shift($deltaRecords);
 		$this->assertEqual('First Test Article', $delta['AuditDelta']['old_value']);
 		$this->assertEqual('First Test Article (Edited)', $delta['AuditDelta']['new_value']);
 
-		// TEST UPDATE OF MULTIPLE PROPERTIES
-		// Pause to simulate a gap between edits
-		// This also allows us to retrieve the last edit for the next set
-		// of tests.
-		$this->Article->create(); // Clear the article id so we get  a new record.
+		// Test Update Of multiple properties.
+		// Pause to simulate a gap between edits.
+		// This also allows us to retrieve the last edit for the next set of tests.
+		$this->Article->create(); // Clear the article id so we get a new record.
 		$newArticle = array(
 			'Article' => array(
 				'user_id' => 1,
@@ -415,7 +412,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		// There are 4 changes, but one to an ignored field
+		// There are 4 changes, but one to an ignored field.
 		$this->assertEqual(3, count($lastAudit['AuditDelta']));
 		$result = Hash::extract($lastAudit, '{n}.AuditDelta[property_name=title].old_value');
 		$this->assertEqual('Second Test Article', array_shift($result));
@@ -459,7 +456,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 			),
 		);
 
-		// TEST NO AUDIT RECORD IF ONLY CHANGE IS IGNORED FIELD
+		// Test no audit record, if only change is on ignored field.
 
 		$this->Article->save($newArticle);
 		$this->Article->saveField('ignored_field', '5');
@@ -503,7 +500,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$lastAudit = $this->Audit->find(
 			'all',
 			array(
-				//'contain'    => array( 'AuditDelta' ), <-- What does this solve?
+				// 'contain' => array( 'AuditDelta' ), <-- What does this solve?
 				'conditions' => array(
 					'Audit.event' => 'DELETE',
 					'Audit.model' => 'Article',
