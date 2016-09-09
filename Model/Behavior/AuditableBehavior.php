@@ -335,11 +335,11 @@ class AuditableBehavior extends \ModelBehavior {
 		return $auditData[$Model->alias];
 	}
 
-	/**
-	 * Get request ID
-	 *
-	 * @return null|string The request ID.
-	 */
+/**
+ * Get request ID
+ *
+ * @return null|string The request ID.
+ */
 	protected function _requestId() {
 		if (empty(self::$_requestId)) {
 			// Class 'String' was deprecated in CakePHP 2.7 and replaced by 'CakeText' (Issue #41)
