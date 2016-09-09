@@ -86,7 +86,8 @@ This will create the `audits` and `audit_deltas` tables that will store each obj
     }
     ````
 
-    The behavior expects the `currentUser()` method to return an associative array with an `id` key. Continuing from the example above, the following code might appear in the `AppModel`:
+    The behavior expects the `currentUser()` method to return an associative array with an `id` key. It is also possible to set a `description` key to add additional details about the user. 
+    Continuing from the example above, the following code might appear in the `AppModel`:
 
     ```` php
     /**
@@ -98,7 +99,10 @@ This will create the `audits` and `audit_deltas` tables that will store each obj
      * @return mixed|null User record. or null if no user is logged in.
      */
     public function currentUser() {
-    	return AuthComponent::user();
+        return array(
+            'id' => AuthComponent::user('id'),
+            'description' => AuthComponent::user('username'),
+        );
     }
     ````
 
