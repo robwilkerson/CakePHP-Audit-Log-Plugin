@@ -15,6 +15,8 @@ class AuditableBehavior extends \ModelBehavior {
 
 /**
  * The requestId is a unique ID generated once per request to allow multiple record changes to be grouped by request
+ *
+ * @var string
  */
 	protected static $_requestId = null;
 
@@ -320,7 +322,7 @@ class AuditableBehavior extends \ModelBehavior {
 			)
 		);
 
-		// If we are using a SoftDelete behavior, $data will return empty after a delete
+		// If we are using a SoftDelete behavior, $data will return empty after a delete.
 		if (empty($data)) {
 			return false;
 		}
