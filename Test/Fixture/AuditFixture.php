@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class AuditFixture
+ * Audit fixtures
  */
 class AuditFixture extends CakeTestFixture {
 
