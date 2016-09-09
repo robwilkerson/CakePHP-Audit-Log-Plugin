@@ -4,7 +4,7 @@ App::uses('Model', 'Model');
 App::uses('AppModel', 'Model');
 
 /**
- * Article model
+ * Article test model
  */
 class Article extends CakeTestModel {
 
@@ -35,7 +35,7 @@ class Article extends CakeTestModel {
 }
 
 /**
- * Author model
+ * Author test model
  */
 class Author extends CakeTestModel {
 
@@ -64,7 +64,7 @@ class Author extends CakeTestModel {
 }
 
 /**
- * Audit model
+ * Audit test model
  */
 class Audit extends CakeTestModel {
 
@@ -79,7 +79,7 @@ class Audit extends CakeTestModel {
 }
 
 /**
- * AuditDelta model
+ * AuditDelta test model
  */
 class AuditDelta extends CakeTestModel {
 
