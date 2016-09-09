@@ -323,18 +323,13 @@ class AuditableBehavior extends \ModelBehavior {
  * so the data will be reduced to an indexed array of those IDs.
  *
  * @param Model $Model The model that uses the behavior.
- * @return  array The model data.
+ * @return  array|false The model data or false.
  */
 	protected function _getModelData(Model $Model) {
-		/*
-		 * turn cacheQueries off for model provided.
-		 */
+		// Turn cacheQueries off for model provided.
 		$Model->cacheQueries = false;
 
-		/*
-		 * Retrieve the model data along with its appropriate HABTM
-		 * model data.
-		 */
+		// Retrieve the model data along with its appropriate HABTM model data.
 		$data = $Model->find(
 			'first',
 			array(
@@ -345,7 +340,7 @@ class AuditableBehavior extends \ModelBehavior {
 			)
 		);
 
-		//If we are using a SoftDelete behavior, $data will return empty after a delete
+		// If we are using a SoftDelete behavior, $data will return empty after a delete
 		if (empty($data)) {
 			return false;
 		}
