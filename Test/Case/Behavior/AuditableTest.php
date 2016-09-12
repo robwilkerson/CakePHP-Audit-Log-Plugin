@@ -477,7 +477,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$this->assertEqual(0, $lastAudit);
+		$this->assertEquals(0, $lastAudit);
 	}
 
 /**
@@ -513,6 +513,6 @@ class AuditableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		$this->assertEqual(1, count($lastAudit));
+		$this->assertCount(1, $lastAudit);
 	}
 }
