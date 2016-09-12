@@ -37,7 +37,7 @@ Use code from the `1.3` branch and follow the instructions in that README file.
 From your `/app/` folder run:
 
 ```sh
-$ composer require robwilkerson/CakePHP-Audit-Log-Plugin
+$ composer require robwilkerson/cakephp-audit-log-plugin
 ```    
 
 This will automatically update your `composer.json`, download and install the required pacakges.
