@@ -503,7 +503,6 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$lastAudit = $this->Audit->find(
 			'all',
 			array(
-				// 'contain' => array( 'AuditDelta' ), <-- What does this solve?
 				'conditions' => array(
 					'Audit.event' => 'DELETE',
 					'Audit.model' => 'Article',
