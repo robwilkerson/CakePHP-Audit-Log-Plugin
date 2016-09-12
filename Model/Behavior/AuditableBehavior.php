@@ -114,6 +114,13 @@ class AuditableBehavior extends \ModelBehavior {
 			return true;
 		}
 
+		// Preserve and unset virtual fields and order as we don't need them
+		// and since they can cause SQL errors.
+		$virtualFields = $Model->virtualFields;
+		$order = $Model->order;
+		$Model->virtualFields = array();
+		$Model->order = array();
+
 		$original = $Model->find(
 			'first',
 			array(
@@ -122,6 +129,9 @@ class AuditableBehavior extends \ModelBehavior {
 			)
 		);
 		$this->_original[$Model->alias] = $original[$Model->alias];
+
+		$Model->virtualFields = $virtualFields;
+		$Model->order = $order;
 
 		return true;
 	}
