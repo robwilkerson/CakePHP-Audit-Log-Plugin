@@ -169,13 +169,13 @@ class AuditableBehaviorTest extends CakeTestCase {
 			)
 		);
 
-		// Verify the audit record
-		$this->assertEqual(1, $article['Article']['user_id']);
-		$this->assertEqual('First Test Article', $article['Article']['title']);
-		$this->assertEqual('N', $article['Article']['published']);
+		// Verify the audit record.
+		$this->assertEquals(1, $article['Article']['user_id']);
+		$this->assertEquals('First Test Article', $article['Article']['title']);
+		$this->assertEquals('N', $article['Article']['published']);
 
-		// Verify that no delta record was created.
-		$this->assertTrue(empty($deltas));
+		// Verify that delta record were created, too.
+		$this->assertCount(6, $deltas);
 	}
 
 /**
