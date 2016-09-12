@@ -99,6 +99,7 @@ This will create the `audits` and `audit_deltas` tables that will store each obj
      * @return mixed|null User record. or null if no user is logged in.
      */
     public function currentUser() {
+        App::uses('AuthComponent', 'Controller/Component');
         return array(
             'id' => AuthComponent::user('id'),
             'description' => AuthComponent::user('username'),
