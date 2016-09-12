@@ -24,6 +24,20 @@ class AuditableBehavior extends \ModelBehavior {
 	protected static $_requestId = null;
 
 /**
+ * A copy of the model virtual fields to restore from
+ *
+ * @var
+ */
+	protected $_modelVirtualFields;
+
+/**
+ * A copy of the model order to restore from
+ *
+ * @var
+ */
+	protected $_modelOrder;
+
+/**
  * Initiate behavior for the model using specified settings.
  *
  * Available settings:
@@ -114,12 +128,7 @@ class AuditableBehavior extends \ModelBehavior {
 			return true;
 		}
 
-		// Preserve and unset virtual fields and order as we don't need them
-		// and since they can cause SQL errors.
-		$virtualFields = $Model->virtualFields;
-		$order = $Model->order;
-		$Model->virtualFields = array();
-		$Model->order = array();
+		$this->_unsetVirtualFieldsTemporarily($Model);
 
 		$original = $Model->find(
 			'first',
@@ -130,8 +139,7 @@ class AuditableBehavior extends \ModelBehavior {
 		);
 		$this->_original[$Model->alias] = $original[$Model->alias];
 
-		$Model->virtualFields = $virtualFields;
-		$Model->order = $order;
+		$this->_restoreVirtualFields($Model);
 
 		return true;
 	}
@@ -334,12 +342,7 @@ class AuditableBehavior extends \ModelBehavior {
 		// Turn cacheQueries off for model provided.
 		$Model->cacheQueries = false;
 
-		// Preserve and unset virtual fields and order as we don't need them
-		// and since they can cause SQL errors.
-		$virtualFields = $Model->virtualFields;
-		$order = $Model->order;
-		$Model->virtualFields = array();
-		$Model->order = array();
+		$this->_unsetVirtualFieldsTemporarily($Model);
 
 		// Retrieve the model data along with its appropriate HABTM model data.
 		$data = $Model->find(
@@ -377,9 +380,7 @@ class AuditableBehavior extends \ModelBehavior {
 			}
 		}
 
-		// Restore virtual fields & order
-		$Model->virtualFields = $virtualFields;
-		$Model->order = $order;
+		$this->_restoreVirtualFields($Model);
 
 		return $auditData[$Model->alias];
 	}
@@ -407,5 +408,30 @@ class AuditableBehavior extends \ModelBehavior {
  */
 	protected function _isAuditLogModel(Model $Model) {
 		return $Model->name === 'Audit' || $Model->name === 'AuditDelta';
+	}
+
+/**
+ * Preserve and unset virtual fields and order as we don't need them and since they can cause SQL errors
+ *
+ * @param Model $Model The model to unset the virtual fields from.
+ * @return void
+ */
+	protected function _unsetVirtualFieldsTemporarily(Model $Model) {
+		$this->_modelVirtualFields = $Model->virtualFields;
+		$this->_modelOrder = $Model->order;
+
+		$Model->virtualFields = array();
+		$Model->order = array();
+	}
+
+/**
+ * Restore the virtual fields & order
+ *
+ * @param Model $Model The model to restore the virtual fields for.
+ * @return void
+ */
+	protected function _restoreVirtualFields(Model $Model) {
+		$Model->virtualFields = $this->_modelVirtualFields;
+		$Model->order = $this->_modelOrder;
 	}
 }
