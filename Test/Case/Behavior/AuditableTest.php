@@ -346,30 +346,31 @@ class AuditableBehaviorTest extends CakeTestCase {
 				),
 			)
 		);
-		$deltaRecords = $this->AuditDelta->find(
-			'all',
-			array(
-				'recursive' => -1,
-				'conditions' => array('AuditDelta.audit_id' => Hash::extract($auditRecords, '{n}.Audit.id')),
-			)
-		);
+
+		// There should be 1 CREATE and 1 EDIT record.
+		$this->assertCount(2, $auditRecords);
 
 		$createAudit = Hash::extract($auditRecords, '{n}.Audit[event=CREATE]');
 		$updateAudit = Hash::extract($auditRecords, '{n}.Audit[event=EDIT]');
 
-		// There should be 1 CREATE and 1 EDIT record.
-		$this->assertEqual(2, count($auditRecords));
-
 		// There should be one audit record for each event.
-		$this->assertEqual(1, count($createAudit));
-		$this->assertEqual(1, count($updateAudit));
+		$this->assertCount(1, $createAudit);
+		$this->assertCount(1, $updateAudit);
+
+		$deltaRecords = $this->AuditDelta->find(
+			'all',
+			array(
+				'recursive' => -1,
+				'conditions' => array('AuditDelta.audit_id' => Hash::extract($updateAudit, '{n}.id')),
+			)
+		);
 
 		// Only one property was changed.
-		$this->assertEqual(1, count($deltaRecords));
+		$this->assertCount(1, $deltaRecords);
 
 		$delta = array_shift($deltaRecords);
-		$this->assertEqual('First Test Article', $delta['AuditDelta']['old_value']);
-		$this->assertEqual('First Test Article (Edited)', $delta['AuditDelta']['new_value']);
+		$this->assertEquals('First Test Article', $delta['AuditDelta']['old_value']);
+		$this->assertEquals('First Test Article (Edited)', $delta['AuditDelta']['new_value']);
 
 		// Test Update Of multiple properties.
 		// Pause to simulate a gap between edits.
@@ -413,27 +414,27 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 
 		// There are 4 changes, but one to an ignored field.
-		$this->assertEqual(3, count($lastAudit['AuditDelta']));
-		$result = Hash::extract($lastAudit, '{n}.AuditDelta[property_name=title].old_value');
-		$this->assertEqual('Second Test Article', array_shift($result));
+		$this->assertCount(3, $lastAudit['AuditDelta']);
+		$result = Hash::extract($lastAudit, 'AuditDelta.{n}[property_name=title].old_value');
+		$this->assertEquals('Second Test Article', array_shift($result));
 
-		$result = Hash::extract($lastAudit, '{n}.AuditDelta[property_name=title].new_value');
-		$this->assertEqual('Second Test Article (Newly Edited)', array_shift($result));
+		$result = Hash::extract($lastAudit, 'AuditDelta.{n}[property_name=title].new_value');
+		$this->assertEquals('Second Test Article (Newly Edited)', array_shift($result));
 
-		$result = Hash::extract($lastAudit, '{n}.AuditDelta[property_name=body].old_value');
-		$this->assertEqual('Second Test Article Body', array_shift($result));
+		$result = Hash::extract($lastAudit, 'AuditDelta.{n}[property_name=body].old_value');
+		$this->assertEquals('Second Test Article Body', array_shift($result));
 
-		$result = Hash::extract($lastAudit, '{n}.AuditDelta[property_name=body].new_value');
-		$this->assertEqual('Second Test Article Body (Also Edited)', array_shift($result));
+		$result = Hash::extract($lastAudit, 'AuditDelta.{n}[property_name=body].new_value');
+		$this->assertEquals('Second Test Article Body (Also Edited)', array_shift($result));
 
-		$result = Hash::extract($lastAudit, '{n}.AuditDelta[property_name=published].old_value');
-		$this->assertEqual('N', array_shift($result));
+		$result = Hash::extract($lastAudit, 'AuditDelta.{n}[property_name=published].old_value');
+		$this->assertEquals('N', array_shift($result));
 
-		$result = Hash::extract($lastAudit, '{n}.AuditDelta[property_name=published].new_value');
-		$this->assertEqual('Y', array_shift($result));
+		$result = Hash::extract($lastAudit, 'AuditDelta.{n}[property_name=published].new_value');
+		$this->assertEquals('Y', array_shift($result));
 
 		// No delta should be reported against the ignored field.
-		$this->assertIdentical(array(), Hash::extract($lastAudit, '{n}.AuditDelta[property_name=ignored_field]'));
+		$this->assertSame(array(), Hash::extract($lastAudit, 'AuditDelta.{n}[property_name=ignored_field]'));
 	}
 
 /**
