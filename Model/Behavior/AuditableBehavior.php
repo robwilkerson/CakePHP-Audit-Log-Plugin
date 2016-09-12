@@ -106,6 +106,11 @@ class AuditableBehavior extends \ModelBehavior {
 			return true;
 		}
 
+		// Skip, if no ID to delete was given.
+		if ($Model->id === false) {
+			return true;
+		}
+
 		$original = $Model->find(
 			'first',
 			array(
