@@ -37,6 +37,11 @@ class AuditableBehavior extends \ModelBehavior {
  * @return void
  */
 	public function setup(Model $Model, $settings = array()) {
+		// Do not act on the AuditLog related models.
+		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+			return;
+		}
+
 		if (!isset($this->settings[$Model->alias])) {
 			$this->settings[$Model->alias] = array(
 				'ignore' => array('created', 'updated', 'modified'),
@@ -73,6 +78,11 @@ class AuditableBehavior extends \ModelBehavior {
  * @return true Always true.
  */
 	public function beforeSave(Model $Model, $options = array()) {
+		// Do not act on the AuditLog related models.
+		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+			return true;
+		}
+
 		// If we're editing an existing object, save off a copy of
 		// the object as it exists before any changes.
 		if (!empty($Model->id)) {
@@ -90,6 +100,11 @@ class AuditableBehavior extends \ModelBehavior {
  * @return true Always true.
  */
 	public function beforeDelete(Model $Model, $cascade = true) {
+		// Do not act on the AuditLog related models.
+		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+			return true;
+		}
+
 		$original = $Model->find(
 			'first',
 			array(
@@ -111,6 +126,11 @@ class AuditableBehavior extends \ModelBehavior {
  * @return true Always true.
  */
 	public function afterSave(Model $Model, $created, $options = array()) {
+		// Do not act on the AuditLog related models.
+		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+			return true;
+		}
+
 		$modelData = $this->_getModelData($Model);
 		if (!$modelData) {
 			$this->afterDelete($Model);
@@ -251,6 +271,11 @@ class AuditableBehavior extends \ModelBehavior {
  * @return void
  */
 	public function afterDelete(Model $Model) {
+		// Do not act on the AuditLog related models.
+		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+			return;
+		}
+
 		// If a currentUser() method exists in the model class (or, of
 		// course, in a superclass) the call that method to pull all user
 		// data. Assume than an ID field exists.
