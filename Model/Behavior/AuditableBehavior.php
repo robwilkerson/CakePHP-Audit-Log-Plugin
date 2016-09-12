@@ -324,6 +324,13 @@ class AuditableBehavior extends \ModelBehavior {
 		// Turn cacheQueries off for model provided.
 		$Model->cacheQueries = false;
 
+		// Preserve and unset virtual fields and order as we don't need them
+		// and since they can cause SQL errors.
+		$virtualFields = $Model->virtualFields;
+		$order = $Model->order;
+		$Model->virtualFields = array();
+		$Model->order = array();
+
 		// Retrieve the model data along with its appropriate HABTM model data.
 		$data = $Model->find(
 			'first',
@@ -359,6 +366,10 @@ class AuditableBehavior extends \ModelBehavior {
 				$auditData[$Model->alias][$habtmModel] = implode(',', $habtmIds);
 			}
 		}
+
+		// Restore virtual fields & order
+		$Model->virtualFields = $virtualFields;
+		$Model->order = $order;
 
 		return $auditData[$Model->alias];
 	}
