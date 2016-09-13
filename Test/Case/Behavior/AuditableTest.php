@@ -179,6 +179,54 @@ class AuditableBehaviorTest extends CakeTestCase {
 	}
 
 /**
+ * Test the action of creating a new record when some values are empty.
+ *
+ * @return void
+ * @todo Test HABTM save.
+ */
+	public function testCreateWithEmptyValues() {
+		$newArticle = array(
+			'Article' => array(
+				'user_id' => 1,
+				'author_id' => 1,
+				'title' => 'First Test Article',
+				'body' => ''
+                // 'published' should be set with default value 'N' (see Fixture)
+			),
+		);
+
+		$this->Article->save($newArticle);
+		$audit = ClassRegistry::init('Audit')->find(
+			'first',
+			array(
+				'recursive' => -1,
+				'conditions' => array(
+					'Audit.event' => 'CREATE',
+					'Audit.model' => 'Article',
+					'Audit.entity_id' => $this->Article->getLastInsertId(),
+				),
+			)
+		);
+		$article = json_decode($audit['Audit']['json_object'], true);
+
+		$deltas = ClassRegistry::init('AuditDelta')->find(
+			'all',
+			array(
+				'recursive' => -1,
+				'conditions' => array('AuditDelta.audit_id' => $audit['Audit']['id']),
+			)
+		);
+
+		// Verify the audit record.
+		$this->assertEquals(1, $article['Article']['user_id']);
+		$this->assertEquals('First Test Article', $article['Article']['title']);
+		$this->assertEquals('N', $article['Article']['published']);
+
+		// Verify that delta record were created, too.
+		$this->assertCount(6, $deltas);
+	}
+
+/**
  * Test saving multiple records with Model::saveAll()
  *
  * @return void
