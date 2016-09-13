@@ -86,7 +86,7 @@ class AuditableBehavior extends \ModelBehavior {
 		// If we're editing an existing object, save off a copy of
 		// the object as it exists before any changes.
 		if (!empty($Model->id)) {
-			$this->_original[$Model->alias] = $this->_getModelData($Model);
+			$this->_setOriginalDataForModel($Model, $this->_getModelData($Model));
 		}
 
 		return true;
@@ -112,7 +112,7 @@ class AuditableBehavior extends \ModelBehavior {
 				'conditions' => array($Model->alias . '.' . $Model->primaryKey => $Model->id),
 			)
 		);
-		$this->_original[$Model->alias] = $original[$Model->alias];
+		$this->_setOriginalDataForModel($Model, $original[$Model->alias]);
 
 		return true;
 	}
@@ -196,15 +196,15 @@ class AuditableBehavior extends \ModelBehavior {
 					);
 				}
 			} else {
-				if (array_key_exists($property, $this->_original[$Model->alias])
-					&& $this->_original[$Model->alias][$property] != $value
+				if (Hash::check($this->_getOriginalDataForModel($Model), $property)
+					&& Hash::get($this->_getOriginalDataForModel($Model), $property) != $value
 				) {
 					// If the property exists in the original _and_ the
 					// value is different, store it.
 					$delta = array(
 						'AuditDelta' => array(
 							'property_name' => $property,
-							'old_value' => $this->_original[$Model->alias][$property],
+							'old_value' => Hash::get($this->_getOriginalDataForModel($Model), $property),
 							'new_value' => $value,
 						),
 					);
@@ -244,7 +244,7 @@ class AuditableBehavior extends \ModelBehavior {
 					$Model->afterAuditProperty(
 						$Model,
 						$delta['AuditDelta']['property_name'],
-						$this->_original[$Model->alias][$delta['AuditDelta']['property_name']],
+						Hash::get($this->_getOriginalDataForModel($Model), $delta['AuditDelta']['property_name']),
 						$delta['AuditDelta']['new_value']
 					);
 				}
@@ -256,10 +256,7 @@ class AuditableBehavior extends \ModelBehavior {
 			array('hasMany' => array('Audit'))
 		);
 
-		/// Unset the original object value so it's ready for the next call.
-		if (isset($this->_original)) {
-			unset($this->_original[$Model->alias]);
-		}
+		$this->_unsetOriginalDataForModel($Model);
 
 		return true;
 	}
@@ -286,7 +283,7 @@ class AuditableBehavior extends \ModelBehavior {
 			$source = $Model->current_user();
 		}
 
-		$audit = array($Model->alias => $this->_original[$Model->alias]);
+		$audit = array($Model->alias => $this->_getOriginalDataForModel($Model));
 		$data = array(
 			'Audit' => array(
 				'event' => 'DELETE',
@@ -302,6 +299,8 @@ class AuditableBehavior extends \ModelBehavior {
 		$this->Audit = ClassRegistry::init('Audit');
 		$this->Audit->create();
 		$this->Audit->save($data);
+
+		$this->_unsetOriginalDataForModel($Model);
 	}
 
 /**
@@ -373,6 +372,37 @@ class AuditableBehavior extends \ModelBehavior {
 		}
 
 		return self::$_requestId;
+	}
+
+/**
+ * Set the original data for a given model
+ *
+ * @param Model $Model The model to set the original data for.
+ * @param array $originalData The original data.
+ * @return void
+ */
+	protected function _setOriginalDataForModel(Model $Model, $originalData) {
+		$this->_original[$Model->alias] = $originalData;
+	}
+
+/**
+ * Get the original data for a given model
+ *
+ * @param Model $Model The model to get the original data for.
+ * @return array|null The original data for the given model.
+ */
+	protected function _getOriginalDataForModel(Model $Model) {
+		return Hash::get($this->_original, $Model->alias, array());
+	}
+
+/**
+ * Unset the original data for a given model
+ *
+ * @param Model $Model The model to unset the original data for.
+ * @return void
+ */
+	protected function _unsetOriginalDataForModel(Model $Model) {
+		unset($this->_original[$Model->alias]);
 	}
 
 /**
