@@ -192,15 +192,13 @@ class AuditableBehavior extends \ModelBehavior {
 			}
 
 			if ($created) {
-				if (!empty($value)) {
-					$delta = array(
-						'AuditDelta' => array(
-							'property_name' => $property,
-							'old_value' => '',
-							'new_value' => $value,
-						),
-					);
-				}
+				$delta = array(
+					'AuditDelta' => array(
+						'property_name' => $property,
+						'old_value' => '',
+						'new_value' => $value,
+					),
+				);
 			} else {
 				if (array_key_exists($property, $this->_original[$Model->alias])
 					&& $this->_original[$Model->alias][$property] != $value
