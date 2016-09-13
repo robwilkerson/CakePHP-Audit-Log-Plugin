@@ -43,12 +43,13 @@ class AuditableBehavior extends \ModelBehavior {
 		}
 
 		if (!isset($this->settings[$Model->alias])) {
-			$this->settings[$Model->alias] = array(
-				'ignore' => array('created', 'updated', 'modified'),
-				'habtm' => count($Model->hasAndBelongsToMany) > 0
+			$this->settings[$Model->alias]['ignore'] = array('created', 'updated', 'modified');
+			$this->settings[$Model->alias]['habtm'] = array();
+			if (!isset($settings['habtm'])) {
+				$this->settings[$Model->alias]['habtm'] = count($Model->hasAndBelongsToMany) > 0
 					? array_keys($Model->hasAndBelongsToMany)
-					: array(),
-			);
+					: array();
+			}
 		}
 		if (!is_array($settings)) {
 			$settings = array();
@@ -102,6 +103,11 @@ class AuditableBehavior extends \ModelBehavior {
 	public function beforeDelete(Model $Model, $cascade = true) {
 		// Do not act on the AuditLog related models.
 		if ($this->_isAuditLogModel($Model)) {
+			return true;
+		}
+
+		// Skip, if no ID to delete was given.
+		if ($Model->id === false) {
 			return true;
 		}
 
