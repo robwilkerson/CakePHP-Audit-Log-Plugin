@@ -16,13 +16,14 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 
 ## Versions
 
-### CakePHP >= 3.0
+### CakePHP 3.x
 
-The `dev-3.x` branch is now dedicated to any CakePHP 3.x development and is still WIP. 
+The `dev-3.x` branch is now dedicated to any CakePHP 3.x development but is still WIP.
+If you are looking for working solutions you can look at the plugins listed at [Awesome CakePHP](https://github.com/FriendsOfCake/awesome-cakephp)
 
 ### CakePHP 2.x
 
-Use the current master branch or use code from the `2.x` branch and follow the instructions in that README file.
+Use the current master branch and follow the instructions below. The `2.x` branch contains a stable version, but is not up to date.
 
 ### CakePHP 1.3.x
 
