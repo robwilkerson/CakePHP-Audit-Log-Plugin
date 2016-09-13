@@ -38,12 +38,13 @@ class AuditableBehavior extends \ModelBehavior {
  */
 	public function setup(Model $Model, $settings = array()) {
 		if (!isset($this->settings[$Model->alias])) {
-			$this->settings[$Model->alias] = array(
-				'ignore' => array('created', 'updated', 'modified'),
-				'habtm' => count($Model->hasAndBelongsToMany) > 0
+			$this->settings[$Model->alias]['ignore'] = array('created', 'updated', 'modified');
+			$this->settings[$Model->alias]['habtm'] = array();
+			if (!isset($settings['habtm'])) {
+				$this->settings[$Model->alias]['habtm'] = count($Model->hasAndBelongsToMany) > 0
 					? array_keys($Model->hasAndBelongsToMany)
-					: array(),
-			);
+					: array();
+			}
 		}
 		if (!is_array($settings)) {
 			$settings = array();
