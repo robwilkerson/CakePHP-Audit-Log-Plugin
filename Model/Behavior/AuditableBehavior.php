@@ -38,7 +38,7 @@ class AuditableBehavior extends \ModelBehavior {
  */
 	public function setup(Model $Model, $settings = array()) {
 		// Do not act on the AuditLog related models.
-		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+		if ($this->_isAuditLogModel($Model)) {
 			return;
 		}
 
@@ -79,7 +79,7 @@ class AuditableBehavior extends \ModelBehavior {
  */
 	public function beforeSave(Model $Model, $options = array()) {
 		// Do not act on the AuditLog related models.
-		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+		if ($this->_isAuditLogModel($Model)) {
 			return true;
 		}
 
@@ -101,7 +101,7 @@ class AuditableBehavior extends \ModelBehavior {
  */
 	public function beforeDelete(Model $Model, $cascade = true) {
 		// Do not act on the AuditLog related models.
-		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+		if ($this->_isAuditLogModel($Model)) {
 			return true;
 		}
 
@@ -127,7 +127,7 @@ class AuditableBehavior extends \ModelBehavior {
  */
 	public function afterSave(Model $Model, $created, $options = array()) {
 		// Do not act on the AuditLog related models.
-		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+		if ($this->_isAuditLogModel($Model)) {
 			return true;
 		}
 
@@ -272,7 +272,7 @@ class AuditableBehavior extends \ModelBehavior {
  */
 	public function afterDelete(Model $Model) {
 		// Do not act on the AuditLog related models.
-		if ($Model->name === 'Audit' || $Model->name === 'AuditDelta') {
+		if ($this->_isAuditLogModel($Model)) {
 			return;
 		}
 
@@ -373,5 +373,15 @@ class AuditableBehavior extends \ModelBehavior {
 		}
 
 		return self::$_requestId;
+	}
+
+/**
+ * Check if the given model is one of AuditLog ones
+ *
+ * @param Model $Model The model to check
+ * @return bool True if yes, else false.
+ */
+	protected function _isAuditLogModel(Model $Model) {
+		return $Model->name === 'Audit' || $Model->name === 'AuditDelta';
 	}
 }
