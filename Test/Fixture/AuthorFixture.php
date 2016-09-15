@@ -21,8 +21,8 @@ class AuthorFixture extends CakeTestFixture {
 		'id' => array('type' => 'integer', 'key' => 'primary'),
 		'first_name' => array('type' => 'string', 'null' => false),
 		'last_name' => array('type' => 'string', 'null' => false),
-		'created' => 'datetime',
-		'updated' => 'datetime',
+		'created' => array('type' => 'datetime'),
+		'updated' => array('type' => 'datetime'),
 	);
 
 /**

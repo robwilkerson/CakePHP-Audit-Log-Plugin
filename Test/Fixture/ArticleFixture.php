@@ -22,11 +22,11 @@ class ArticleFixture extends CakeTestFixture {
 		'user_id' => array('type' => 'integer', 'null' => false),
 		'author_id' => array('type' => 'integer', 'null' => false),
 		'title' => array('type' => 'string', 'null' => false),
-		'body' => 'text',
+		'body' => array('type' => 'text'),
 		'published' => array('type' => 'string', 'length' => 1, 'default' => 'N'),
 		'ignored_field' => array('type' => 'integer', 'length' => 1, 'default' => 0),
-		'created' => 'datetime',
-		'updated' => 'datetime',
+		'created' => array('type' => 'datetime'),
+		'updated' => array('type' => 'datetime'),
 	);
 
 /**
