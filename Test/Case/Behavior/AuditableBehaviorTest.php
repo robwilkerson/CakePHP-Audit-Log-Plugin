@@ -91,17 +91,6 @@ class AuditableBehaviorTest extends CakeTestCase {
 	}
 
 /**
- * Method executed after each test
- *
- * @return void
- */
-	public function tearDown() {
-		unset($this->Article);
-
-		ClassRegistry::flush();
-	}
-
-/**
  * Test the action of creating a new record.
  *
  * @return void
