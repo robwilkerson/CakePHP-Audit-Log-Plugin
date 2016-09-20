@@ -1,5 +1,8 @@
 <?php
 
+App::uses('Audit', 'AuditLog.Model');
+App::uses('AuditDelta', 'AuditLog.Model');
+
 /**
  * Records changes made to an object during save operations.
  */
@@ -147,13 +150,9 @@ class AuditableBehavior extends \ModelBehavior {
 		$audit[$Model->alias] = $modelData;
 		$audit[$Model->alias][$Model->primaryKey] = $Model->id;
 
-		// Create a runtime association with the Audit model and bind the
-		// Audit model to its AuditDelta model.
+		// Create a runtime association with the Audit model
 		$Model->bindModel(
-			array('hasMany' => array('Audit'))
-		);
-		$Model->Audit->bindModel(
-			array('hasMany' => array('AuditDelta'))
+			array('hasMany' => array('AuditLog.Audit'))
 		);
 
 		// If a currentUser() method exists in the model class (or, of
@@ -303,7 +302,7 @@ class AuditableBehavior extends \ModelBehavior {
 			),
 		);
 
-		$this->Audit = ClassRegistry::init('Audit');
+		$this->Audit = ClassRegistry::init('AuditLog.Audit');
 		$this->Audit->create();
 		$this->Audit->save($data);
 	}

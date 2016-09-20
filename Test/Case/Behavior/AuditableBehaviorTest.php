@@ -1,7 +1,8 @@
 <?php
 
-App::uses('Model', 'Model');
 App::uses('AppModel', 'Model');
+App::uses('Audit', 'AuditLog.Model');
+App::uses('AuditDelta', 'AuditLog.Model');
 
 /**
  * Article test model
@@ -64,36 +65,6 @@ class Author extends CakeTestModel {
 }
 
 /**
- * Audit test model
- */
-class Audit extends CakeTestModel {
-
-/**
- * Has many relationships
- *
- * @var array
- */
-	public $hasMany = array(
-		'AuditDelta',
-	);
-}
-
-/**
- * AuditDelta test model
- */
-class AuditDelta extends CakeTestModel {
-
-/**
- * Belongs to relationships
- *
- * @var array
- */
-	public $belongsTo = array(
-		'Audit',
-	);
-}
-
-/**
  * AuditableBehavior Tests
  */
 class AuditableBehaviorTest extends CakeTestCase {
@@ -120,17 +91,6 @@ class AuditableBehaviorTest extends CakeTestCase {
 	}
 
 /**
- * Method executed after each test
- *
- * @return void
- */
-	public function tearDown() {
-		unset($this->Article);
-
-		ClassRegistry::flush();
-	}
-
-/**
  * Test the action of creating a new record.
  *
  * @return void
@@ -148,7 +108,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 
 		$this->Article->save($newArticle);
-		$audit = ClassRegistry::init('Audit')->find(
+		$audit = ClassRegistry::init('AuditLog.Audit')->find(
 			'first',
 			array(
 				'recursive' => -1,
@@ -161,7 +121,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 		$article = json_decode($audit['Audit']['json_object'], true);
 
-		$deltas = ClassRegistry::init('AuditDelta')->find(
+		$deltas = ClassRegistry::init('AuditLog.AuditDelta')->find(
 			'all',
 			array(
 				'recursive' => -1,
@@ -196,7 +156,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 
 		$this->Article->save($newArticle);
-		$audit = ClassRegistry::init('Audit')->find(
+		$audit = ClassRegistry::init('AuditLog.Audit')->find(
 			'first',
 			array(
 				'recursive' => -1,
@@ -209,7 +169,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 		$article = json_decode($audit['Audit']['json_object'], true);
 
-		$deltas = ClassRegistry::init('AuditDelta')->find(
+		$deltas = ClassRegistry::init('AuditLog.AuditDelta')->find(
 			'all',
 			array(
 				'recursive' => -1,
@@ -248,7 +208,9 @@ class AuditableBehaviorTest extends CakeTestCase {
 
 		$this->Article->saveAll($data);
 
-		$articleAudit = ClassRegistry::init('Audit')->find(
+		$auditModel = ClassRegistry::init('AuditLog.Audit');
+
+		$articleAudit = $auditModel->find(
 			'first',
 			array(
 				'recursive' => 1,
@@ -269,7 +231,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		// Verify the delta records were created.
 		$this->assertCount(6, $articleAudit['AuditDelta']);
 
-		$authorAudit = ClassRegistry::init('Audit')->find(
+		$authorAudit = $auditModel->find(
 			'first',
 			array(
 				'recursive' => 1,
@@ -325,7 +287,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$this->Article->saveAll($data);
 
 		// Retrieve the audits for the last 3 articles saved.
-		$audits = ClassRegistry::init('Audit')->find(
+		$audits = $auditModel->find(
 			'all',
 			array(
 				'conditions' => array(
@@ -368,8 +330,8 @@ class AuditableBehaviorTest extends CakeTestCase {
  * @todo Test HABTM save.
  */
 	public function testEdit() {
-		$this->Audit = ClassRegistry::init('Audit');
-		$this->AuditDelta = ClassRegistry::init('AuditDelta');
+		$this->Audit = ClassRegistry::init('AuditLog.Audit');
+		$this->AuditDelta = ClassRegistry::init('AuditLog.AuditDelta');
 
 		$newArticle = array(
 			'Article' => array(
@@ -493,8 +455,8 @@ class AuditableBehaviorTest extends CakeTestCase {
  * @return void
  */
 	public function testIgnoredField() {
-		$this->Audit = ClassRegistry::init('Audit');
-		$this->AuditDelta = ClassRegistry::init('AuditDelta');
+		$this->Audit = ClassRegistry::init('AuditLog.Audit');
+		$this->AuditDelta = ClassRegistry::init('AuditLog.AuditDelta');
 
 		$newArticle = array(
 			'Article' => array(
@@ -534,8 +496,8 @@ class AuditableBehaviorTest extends CakeTestCase {
  * @return void
  */
 	public function testDelete() {
-		$this->Audit = ClassRegistry::init('Audit');
-		$this->AuditDelta = ClassRegistry::init('AuditDelta');
+		$this->Audit = ClassRegistry::init('AuditLog.Audit');
+		$this->AuditDelta = ClassRegistry::init('AuditLog.AuditDelta');
 		$article = $this->Article->find(
 			'first',
 			array(
