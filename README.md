@@ -12,7 +12,6 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 * Allows developers to ignore changes to specified properties. Properties named `created`, `updated` and `modified` are ignored by default, but these values can be overwritten.
 * Handles changes to HABTM associations.
 * Fully compatible with the [`PolymorphicBehavior`](https://github.com/cakephp/cookbook/blob/master/models/behaviors/polymorphic.php).
-* Does not require or rely on the existence of explicit models revisions (`AuditLog`) and deltas (`AuditLogDeltas`).
 
 ## Versions
 
