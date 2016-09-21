@@ -12,21 +12,22 @@ The behavior tracks changes on two levels. It takes a snapshot of the fully hydr
 * Allows developers to ignore changes to specified properties. Properties named `created`, `updated` and `modified` are ignored by default, but these values can be overwritten.
 * Handles changes to HABTM associations.
 * Fully compatible with the [`PolymorphicBehavior`](https://github.com/cakephp/cookbook/blob/master/models/behaviors/polymorphic.php).
+* Fully compatible with [`SoftDelete`](https://github.com/CakeDC/utils).
 
 ## Versions
+
+### CakePHP 2.x
+
+Use the current master branch and follow the instructions below. 
 
 ### CakePHP 3.x
 
 The `dev-3.x` branch is now dedicated to any CakePHP 3.x development but is still WIP.
 If you are looking for working solutions you can look at the plugins listed at [Awesome CakePHP](https://github.com/FriendsOfCake/awesome-cakephp)
 
-### CakePHP 2.x
-
-Use the current master branch and follow the instructions below. The `2.x` branch contains a stable version, but is not up to date.
-
 ### CakePHP 1.3.x
 
-Use code from the `1.3` branch and follow the instructions in that README file.
+Use code from the `1.3` branch and follow the instructions in that README file. Please not that development has ended for this version.
 
 ## Installation (2.x)
 
