@@ -1,3 +1,7 @@
+## Please note that this version is no longer supported. It is working but missing many features that were added in the 2.x version, so we strongly recommend upgrading at this point.
+
+***
+
 # Audit Log Plugin
 
 A logging plugin for [CakePHP](http://cakephp.org). The included `AuditableBehavior`  creates an audit history for each instance of a model to which it's attached.
