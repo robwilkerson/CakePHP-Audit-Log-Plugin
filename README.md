@@ -156,7 +156,9 @@ class AnotherModel extends AppModel {
 
 ### Callbacks
 
-The plugin offers multiple [Callbacks](http://book.cakephp.org/2.0/en/models/callback-methods.html) that allow the execution of additional logic before or after an operation of this Plugin.
+The plugin offers multiple [Callbacks](http://book.cakephp.org/2.0/en/models/callback-methods.html) that allow the execution of additional logic before or after an operation of this Plugin. 
+
+To add a custom Callback create a method with one of the names listed below in your audited model.
 
 #### afterAuditCreate
 ###### afterAuditCreate(Model $Model)
