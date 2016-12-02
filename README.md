@@ -159,13 +159,13 @@ class AnotherModel extends AppModel {
 The plugin offers multiple [Callbacks](http://book.cakephp.org/2.0/en/models/callback-methods.html) that allow the execution of additional logic before or after an operation of this Plugin.
 
 #### afterAuditCreate
-###### afterAuditCreate(string $Model)
+###### afterAuditCreate(Model $Model)
 
 Triggers if a new record is inserted in the Audit table
 * `$Model` Name of the model where the record is created
 
 #### afterAuditUpdate
-###### afterAuditCreate(string $Model, array $original, array $updates, int $auditId)
+###### afterAuditCreate(Model $Model, array $original, array $updates, int $auditId)
 
 Triggers if a record is updated in the Audit table.
 * `$Model` Name of the model where record is updated
@@ -174,7 +174,7 @@ Triggers if a record is updated in the Audit table.
 * `$auditId` Id of the record in the `Audit` table
 
 #### afterAuditProperty
-###### afterAuditCreate(string $Model, string $propertyName, string $oldValue, string $newValue)
+###### afterAuditCreate(Model $Model, string $propertyName, string $oldValue, string $newValue)
 
 Triggers each time a property is inserted into the `audit_deltas` table.  
 * `$Model` Name of the model where record is created / updated
