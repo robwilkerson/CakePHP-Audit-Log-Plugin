@@ -27,7 +27,7 @@ If you are looking for working solutions you can look at the plugins listed at [
 
 ### CakePHP 1.3.x
 
-Use code from the `1.3` branch and follow the instructions in that README file. Please not that development has ended for this version.
+Use code from the `1.3` branch and follow the instructions in that README file. Please note that development has ended for this version.
 
 ## Installation (2.x)
 
@@ -153,6 +153,34 @@ class AnotherModel extends AppModel {
 	// More model code here.
 }
 ````
+
+### Callbacks
+
+The plugin offers multiple [Callbacks](http://book.cakephp.org/2.0/en/models/callback-methods.html) that allow the execution of additional logic before or after an operation of this Plugin.
+
+#### afterAuditCreate
+###### afterAuditCreate(string $Model)
+
+Triggers if a new record is inserted in the Audit table
+* `$Model` Name of the model where the record is created
+
+#### afterAuditUpdate
+###### afterAuditCreate(string $Model, array $original, array $updates, int $auditId)
+
+Triggers if a record is updated in the Audit table.
+* `$Model` Name of the model where record is updated
+* `$original` Contains a copy of the object as it existed prior to the save
+* `$updates` Set of records that have been updated
+* `$auditId` Id of the record in the `Audit` table
+
+#### afterAuditProperty
+###### afterAuditCreate(string $Model, string $propertyName, string $oldValue, string $newValue)
+
+Triggers each time a property is inserted into the `audit_deltas` table.  
+* `$Model` Name of the model where record is created / updated
+* `$propertyName` Name of the property (field name)
+* `$oldValue` Original value of the property
+* `$newValue` New value of the property
 
 ## License
 
