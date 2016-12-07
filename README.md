@@ -41,7 +41,7 @@ From your `/app/` folder run:
 $ composer require robwilkerson/cakephp-audit-log-plugin
 ```    
 
-This will automatically update your `composer.json`, download and install the required pacakges.
+This will automatically update your `composer.json`, download and install the required packages.
 
 #### As an Archive
 
