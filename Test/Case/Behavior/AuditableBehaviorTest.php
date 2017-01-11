@@ -1,68 +1,9 @@
 <?php
 
-App::uses('AppModel', 'Model');
 App::uses('Audit', 'AuditLog.Model');
 App::uses('AuditDelta', 'AuditLog.Model');
 
-/**
- * Article test model
- */
-class Article extends CakeTestModel {
-
-/**
- * The name of the model
- *
- * @var string
- */
-	public $name = 'Article';
-
-/**
- * The behaviors
- *
- * @var array
- */
-	public $actsAs = array(
-		'AuditLog.Auditable' => array(
-			'ignore' => array('ignored_field'),
-		),
-	);
-
-/**
- * Belongs to relationships
- *
- * @var array
- */
-	public $belongsTo = array('Author');
-}
-
-/**
- * Author test model
- */
-class Author extends CakeTestModel {
-
-/**
- * The name of the model
- *
- * @var string
- */
-	public $name = 'Author';
-
-/**
- * The behaviors
- *
- * @var array
- */
-	public $actsAs = array(
-		'AuditLog.Auditable',
-	);
-
-/**
- * Has many relationships
- *
- * @var array
- */
-	public $hasMany = array('Article');
-}
+require_once dirname(__FILE__) . DS . 'models.php';
 
 /**
  * AuditableBehavior Tests
@@ -77,6 +18,8 @@ class AuditableBehaviorTest extends CakeTestCase {
 	public $fixtures = array(
 		'plugin.audit_log.article',
 		'plugin.audit_log.author',
+        'plugin.audit_log.tag',
+        'plugin.audit_log.articles_tag',
 		'plugin.audit_log.audit',
 		'plugin.audit_log.audit_delta',
 	);
@@ -88,13 +31,15 @@ class AuditableBehaviorTest extends CakeTestCase {
  */
 	public function setUp() {
 		$this->Article = ClassRegistry::init('Article');
+		$this->Tag = ClassRegistry::init('Tag');
+        $this->Audit = ClassRegistry::init('AuditLog.Audit');
+        $this->AuditDelta = ClassRegistry::init('AuditLog.AuditDelta');
 	}
 
 /**
  * Test the action of creating a new record.
  *
  * @return void
- * @todo Test HABTM save.
  */
 	public function testCreate() {
 		$newArticle = array(
@@ -108,7 +53,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 
 		$this->Article->save($newArticle);
-		$audit = ClassRegistry::init('AuditLog.Audit')->find(
+		$audit = $this->Audit->find(
 			'first',
 			array(
 				'recursive' => -1,
@@ -121,7 +66,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 		$article = json_decode($audit['Audit']['json_object'], true);
 
-		$deltas = ClassRegistry::init('AuditLog.AuditDelta')->find(
+		$deltas = $this->AuditDelta->find(
 			'all',
 			array(
 				'recursive' => -1,
@@ -135,14 +80,13 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$this->assertEquals('N', $article['Article']['published']);
 
 		// Verify that delta record were created, too.
-		$this->assertCount(6, $deltas);
+		$this->assertCount(7, $deltas);
 	}
 
 /**
  * Test the action of creating a new record when some values are empty.
  *
  * @return void
- * @todo Test HABTM save.
  */
 	public function testCreateWithEmptyValues() {
 		$newArticle = array(
@@ -156,7 +100,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 
 		$this->Article->save($newArticle);
-		$audit = ClassRegistry::init('AuditLog.Audit')->find(
+		$audit = $this->Audit->find(
 			'first',
 			array(
 				'recursive' => -1,
@@ -169,7 +113,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		);
 		$article = json_decode($audit['Audit']['json_object'], true);
 
-		$deltas = ClassRegistry::init('AuditLog.AuditDelta')->find(
+		$deltas = $this->AuditDelta->find(
 			'all',
 			array(
 				'recursive' => -1,
@@ -183,75 +127,80 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$this->assertEquals('N', $article['Article']['published']);
 
 		// Verify that delta record were created, too.
-		$this->assertCount(6, $deltas);
+		$this->assertCount(7, $deltas);
 	}
+
+/**
+ * Test saving associated records with Model::saveAll()
+ *
+ * @return void
+ */
+	public function testSaveAssociated()
+    {
+        // Test a model and a single associated model.
+        $data = array(
+            'Article' => array(
+                'user_id' => 1,
+                'title' => 'Rob\'s Test Article',
+                'body' => 'Rob\'s Test Article Body',
+                'published' => 'Y',
+            ),
+            'Author' => array(
+                'first_name' => 'Rob',
+                'last_name' => 'Wilkerson',
+            ),
+        );
+
+        $this->Article->saveAll($data);
+
+        $articleAudit = $this->Audit->find(
+            'first',
+            array(
+                'recursive' => 1,
+                'conditions' => array(
+                    'Audit.event' => 'CREATE',
+                    'Audit.model' => 'Article',
+                    'Audit.entity_id' => $this->Article->getLastInsertId(),
+                ),
+            )
+        );
+        $article = json_decode($articleAudit['Audit']['json_object'], true);
+
+        // Verify the audit record.
+        $this->assertEquals(1, $article['Article']['user_id']);
+        $this->assertEquals('Rob\'s Test Article', $article['Article']['title']);
+        $this->assertEquals('Y', $article['Article']['published']);
+
+        // Verify the delta records were created.
+        $this->assertCount(7, $articleAudit['AuditDelta']);
+
+        $authorAudit = $this->Audit->find(
+            'first',
+            array(
+                'recursive' => 1,
+                'conditions' => array(
+                    'Audit.event' => 'CREATE',
+                    'Audit.model' => 'Author',
+                    'Audit.entity_id' => $this->Article->Author->getLastInsertId(),
+                ),
+            )
+        );
+        $author = json_decode($authorAudit['Audit']['json_object'], true);
+
+        // Verify the audit record.
+        $this->assertEquals($article['Article']['author_id'], $author['Author']['id']);
+        $this->assertEquals('Rob', $author['Author']['first_name']);
+
+        // Verify the delta records were created.
+        $this->assertCount(3, $authorAudit['AuditDelta']);
+    }
 
 /**
  * Test saving multiple records with Model::saveAll()
  *
  * @return void
  */
-	public function testSaveAll() {
-		// Test a model and a single associated model.
-		$data = array(
-			'Article' => array(
-				'user_id' => 1,
-				'title' => 'Rob\'s Test Article',
-				'body' => 'Rob\'s Test Article Body',
-				'published' => 'Y',
-			),
-			'Author' => array(
-				'first_name' => 'Rob',
-				'last_name' => 'Wilkerson',
-			),
-		);
-
-		$this->Article->saveAll($data);
-
-		$auditModel = ClassRegistry::init('AuditLog.Audit');
-
-		$articleAudit = $auditModel->find(
-			'first',
-			array(
-				'recursive' => 1,
-				'conditions' => array(
-					'Audit.event' => 'CREATE',
-					'Audit.model' => 'Article',
-					'Audit.entity_id' => $this->Article->getLastInsertId(),
-				),
-			)
-		);
-		$article = json_decode($articleAudit['Audit']['json_object'], true);
-
-		// Verify the audit record.
-		$this->assertEquals(1, $article['Article']['user_id']);
-		$this->assertEquals('Rob\'s Test Article', $article['Article']['title']);
-		$this->assertEquals('Y', $article['Article']['published']);
-
-		// Verify the delta records were created.
-		$this->assertCount(6, $articleAudit['AuditDelta']);
-
-		$authorAudit = $auditModel->find(
-			'first',
-			array(
-				'recursive' => 1,
-				'conditions' => array(
-					'Audit.event' => 'CREATE',
-					'Audit.model' => 'Author',
-					'Audit.entity_id' => $this->Article->Author->getLastInsertId(),
-				),
-			)
-		);
-		$author = json_decode($authorAudit['Audit']['json_object'], true);
-
-		// Verify the audit record.
-		$this->assertEquals($article['Article']['author_id'], $author['Author']['id']);
-		$this->assertEquals('Rob', $author['Author']['first_name']);
-
-		// Verify the delta records were created.
-		$this->assertCount(3, $authorAudit['AuditDelta']);
-
-		// Test multiple records of one model.
+    public function testSaveMany() {
 		$data = array(
 			array(
 				'Article' => array(
@@ -287,7 +236,7 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$this->Article->saveAll($data);
 
 		// Retrieve the audits for the last 3 articles saved.
-		$audits = $auditModel->find(
+		$audits = $this->Audit->find(
 			'all',
 			array(
 				'conditions' => array(
@@ -317,9 +266,9 @@ class AuditableBehaviorTest extends CakeTestCase {
 		$this->assertEquals('Y', $article3['Article']['published']);
 
 		// Verify that no delta records were created.
-		$this->assertCount(6, $audits[0]['AuditDelta']);
-		$this->assertCount(6, $audits[1]['AuditDelta']);
-		$this->assertCount(6, $audits[2]['AuditDelta']);
+		$this->assertCount(7, $audits[0]['AuditDelta']);
+		$this->assertCount(7, $audits[1]['AuditDelta']);
+		$this->assertCount(7, $audits[2]['AuditDelta']);
 	}
 
 /**
@@ -330,9 +279,6 @@ class AuditableBehaviorTest extends CakeTestCase {
  * @todo Test HABTM save.
  */
 	public function testEdit() {
-		$this->Audit = ClassRegistry::init('AuditLog.Audit');
-		$this->AuditDelta = ClassRegistry::init('AuditLog.AuditDelta');
-
 		$newArticle = array(
 			'Article' => array(
 				'user_id' => 1,
@@ -455,9 +401,6 @@ class AuditableBehaviorTest extends CakeTestCase {
  * @return void
  */
 	public function testIgnoredField() {
-		$this->Audit = ClassRegistry::init('AuditLog.Audit');
-		$this->AuditDelta = ClassRegistry::init('AuditLog.AuditDelta');
-
 		$newArticle = array(
 			'Article' => array(
 				'user_id' => 1,
@@ -496,8 +439,6 @@ class AuditableBehaviorTest extends CakeTestCase {
  * @return void
  */
 	public function testDelete() {
-		$this->Audit = ClassRegistry::init('AuditLog.Audit');
-		$this->AuditDelta = ClassRegistry::init('AuditLog.AuditDelta');
 		$article = $this->Article->find(
 			'first',
 			array(
