@@ -152,7 +152,7 @@ class AnotherModel extends AppModel {
 
 	// More model code here.
 }
-````
+`````
 
 ### Callbacks
 
