@@ -186,7 +186,7 @@ class AuditableBehavior extends \ModelBehavior {
 		$data = array(
 			'Audit' => array(
 				'event' => $created ? 'CREATE' : 'EDIT',
-				'model' => $Model->alias,
+				'model' => $Model->plugin ? $Model->plugin . '.' . $Model->alias : $Model->alias,
 				'entity_id' => $Model->id,
 				'request_id' => self::_requestId(),
 				'json_object' => json_encode($audit),
@@ -308,7 +308,7 @@ class AuditableBehavior extends \ModelBehavior {
 		$data = array(
 			'Audit' => array(
 				'event' => 'DELETE',
-				'model' => $Model->alias,
+				'model' => $Model->plugin ? $Model->plugin . '.' . $Model->alias : $Model->alias,
 				'entity_id' => $Model->id,
 				'request_id' => self::_requestId(),
 				'json_object' => json_encode($audit),
