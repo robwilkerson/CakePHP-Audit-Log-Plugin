@@ -217,9 +217,9 @@ class AuditableBehavior extends \ModelBehavior {
 					),
 				);
 			} else {
-				if (Hash::check($this->_getOriginalDataForModel($Model), $property)
+				if ((Hash::check($this->_getOriginalDataForModel($Model), $property)
 					&& Hash::get($this->_getOriginalDataForModel($Model), $property) != $value
-				) {
+				) || (Hash::get($this->_getOriginalDataForModel($Model), $property) == NULl &&  $value != NULL and $value!="")) {
 					// If the property exists in the original _and_ the
 					// value is different, store it.
 					$delta = array(
